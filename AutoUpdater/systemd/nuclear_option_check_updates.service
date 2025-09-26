@@ -1,0 +1,11 @@
+[Unit]
+Description=Nuclear Option Update Check
+
+[Service]
+Type=oneshot
+User=steam
+Group=steam
+
+# make sure path is correct
+WorkingDirectory=/home/steam/Nuclear-Option-AutoUpdater
+ExecStart=python3 /home/steam/Nuclear-Option-AutoUpdater/update_checker.py

@@ -1,0 +1,13 @@
+[Unit]
+Description=Nuclear Option Update Check Timer
+
+[Timer]
+# Run the update check 1 minute after the system boots.
+OnBootSec=1min
+
+# Run the update check every 30 minutes.
+# The timer is activated relative to the completion of the last check.
+OnUnitActiveSec=30min
+
+[Install]
+WantedBy=timers.target
