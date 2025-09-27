@@ -5,7 +5,7 @@ import re
 from remote_commander import RemoteCommander
 
 
-def get_latest_build_id(app_id, branch):
+def get_latest_build_id(app_id, branch, install_dir):
     """
     Gets the latest build ID for a given app and branch from SteamCMD.
     """
@@ -14,34 +14,45 @@ def get_latest_build_id(app_id, branch):
 
     try:
         command = [
-            "steamcmd",
+            "/usr/games/steamcmd",
             "+login", "anonymous",
             "+app_info_print", app_id,
             "+quit"
         ]
         process = subprocess.run(
-            command, capture_output=True, text=True, check=True, encoding='utf-8')
+            command, capture_output=True, text=True, check=True, encoding='utf-8', cwd=install_dir)
 
         lines = process.stdout.splitlines()
         in_branches_section = False
         in_target_branch_section = False
+
         for line in lines:
-            if '"branches"' in line:
-                in_branches_section = True
+            # print(line)
+            stripped_line = line.strip()
+
+            if not in_branches_section:
+                if stripped_line == '"branches"':
+                    in_branches_section = True
                 continue
 
-            if in_branches_section and f'""' in line:
-                if in_target_branch_section:
-                    # Exited the target branch section
-                    break
-                if f'"{branch}"' in line:
+            # We are inside the "branches" section.
+            if not in_target_branch_section:
+                if stripped_line == f'"{branch}"':
                     in_target_branch_section = True
                 continue
 
-            if in_target_branch_section and '"buildid"' in line:
-                match = re.search(r'"buildid"\s+"(\d+)"', line)
+            # We are inside the target branch's section.
+            if '"buildid"' in stripped_line:
+                match = re.search(r'"buildid"\s+"(\d+)"', stripped_line)
                 if match:
                     return match.group(1)
+
+            # If we see a '}' this could be the end of our section.
+            if stripped_line == '}':
+                # We were in the target branch, but we're leaving.
+                # The buildid was not found.
+                if in_target_branch_section:
+                    break
 
         print(f"Could not find build ID for branch '{branch}'.")
         return None
@@ -94,7 +105,7 @@ def main():
         install_dir, "steamapps", f"appmanifest_{app_id}.acf")
 
     print("Checking for updates...")
-    latest_build_id = get_latest_build_id(app_id, branch)
+    latest_build_id = get_latest_build_id(app_id, branch, install_dir)
     local_build_id = get_local_build_id(manifest_path)
 
     print(f"Latest build ID: {latest_build_id}")
