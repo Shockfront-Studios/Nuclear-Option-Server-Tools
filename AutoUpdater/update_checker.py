@@ -114,7 +114,9 @@ def main():
     if latest_build_id and local_build_id and latest_build_id != local_build_id:
         print("New update available!")
         commander = RemoteCommander("localhost", remote_command_port)
-        commander.send_command("update-ready")
+        success, response = commander.send_command("update-ready")
+        if success:
+            print("command success")
     else:
         print("No new update available.")
 
