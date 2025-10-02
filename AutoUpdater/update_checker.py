@@ -54,7 +54,10 @@ def get_latest_build_id(app_id, branch, install_dir):
                 if in_target_branch_section:
                     break
 
-        print(f"Could not find build ID for branch '{branch}'.")
+        print(
+            f"Could not find build ID for branch '{branch}'. full result below:")
+        for line in lines:
+            print(line)
         return None
 
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
@@ -70,8 +73,9 @@ def get_local_build_id(manifest_path):
     try:
         with open(manifest_path, 'r', encoding='utf-8') as f:
             for line in f:
-                if '"buildid"' in line:
-                    match = re.search(r'"buildid"\s+"(\d+)"', line)
+                # check TargetBuildID instead, because buildid might be a merged build id from multiple depots
+                if '"TargetBuildID"' in line:
+                    match = re.search(r'"TargetBuildID"\s+"(\d+)"', line)
                     if match:
                         return match.group(1)
         print("Could not parse build ID from appmanifest file.")
