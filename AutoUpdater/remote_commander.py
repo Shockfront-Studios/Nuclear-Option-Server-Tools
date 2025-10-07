@@ -2,7 +2,6 @@ import json
 import socket
 import struct
 from enum import IntEnum, auto
-import sys
 from typing import List, Dict, Optional, Tuple
 
 
@@ -54,7 +53,7 @@ class RemoteCommander:
                 return self._receive_response(s)
 
         except (socket.error, OverflowError) as e:
-            print(f"Network or connection error: {e}", file=sys.stderr)
+            print(f"Network or connection error: {e}")
             return False, None
 
     def _receive_response(self, sock: socket.socket) -> Tuple[bool, Optional[Dict]]:
@@ -68,19 +67,16 @@ class RemoteCommander:
             status_int, body_length = struct.unpack('<ii', header)
 
         except ConnectionResetError as e:
-            print(
-                f"Error: Connection reset during header read. {e}", file=sys.stderr)
+            print(f"Error: Connection reset during header read. {e}")
             return False, None
         except struct.error:
-            print(
-                "Error: Failed to unpack response header (corrupt data).", file=sys.stderr)
+            print("Error: Failed to unpack response header (corrupt data).")
             return False, None
 
         try:
             status_code = StatusCode(status_int)
         except ValueError:
-            print(
-                f"Error: Server returned unknown status code: {status_int}", file=sys.stderr)
+            print(f"Error: Server returned unknown status code: {status_int}")
             return False, None
 
         data = None
@@ -92,25 +88,24 @@ class RemoteCommander:
                     data = json.loads(body_str)
                 except json.JSONDecodeError:
                     print(
-                        "Error: Successfully received response, but failed to parse JSON body.", file=sys.stderr)
+                        "Error: Successfully received response, but failed to parse JSON body.")
                     return False, None
 
             except ConnectionResetError as e:
-                print(
-                    f"Error: Connection reset during body read. {e}", file=sys.stderr)
+                print(f"Error: Connection reset during body read. {e}")
                 return False, None
             except OverflowError:
                 print(
-                    f"Error: Received body length ({body_length}) is too large.", file=sys.stderr)
+                    f"Error: Received body length ({body_length}) is too large.")
                 return False, None
 
         if status_code == StatusCode.Success:
             return True, data
         else:
             print(
-                f"Server returned error code {status_code.value} ({status_code.name}).", file=sys.stderr)
+                f"Server returned error code {status_code.value} ({status_code.name}).")
             if data is not None:
-                print(f"Error body: {data}", file=sys.stderr)
+                print(f"Error body: {data}")
             return False, None
 
     def _recv_n(self, sock: socket.socket, n: int) -> bytes:
