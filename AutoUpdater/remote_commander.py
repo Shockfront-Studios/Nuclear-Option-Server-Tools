@@ -36,12 +36,12 @@ class RemoteCommander:
     def send_command(self, command_name: str, arguments: List[str] = []) -> Tuple[bool, Optional[Dict]]:
         """
         Sends a command to the server and waits for the response.
-        {"Name": "command", "Arguments": ["arg1"]}
+        {"name": "command", "arguments": ["arg1"]}
 
         Returns (success_bool, response_body_dict_or_None).
         """
         try:
-            payload = {"Name": command_name, "Arguments": arguments}
+            payload = {"name": command_name, "arguments": arguments}
             json_data = json.dumps(payload).encode('utf-8')
             message = struct.pack('<i', len(json_data)) + json_data
 
