@@ -11,3 +11,5 @@ FLASK_PORT = 5000
 # Security Configuration
 USERNAME = "admin"
 PASSWORD = "changeme"  # PLEASE CHANGE THIS!
+SSL_CERT_PATH = ""  # Path to your SSL certificate file (e.g., /path/to/cert.pem)
+SSL_KEY_PATH = ""   # Path to your SSL private key file (e.g., /path/to/key.pem)

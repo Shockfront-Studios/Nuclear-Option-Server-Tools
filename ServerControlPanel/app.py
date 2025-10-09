@@ -186,11 +186,8 @@ def banlist_clear():
 
 
 if __name__ == '__main__':
-    # SSL REQUIRED IF RUNNING ON PUBLIC PORT
-    # ssl_context = ('/path/to/your/certificate.crt',
-    #                '/path/to/your/private.key')
-    # app.run(host=config.FLASK_HOST, port=config.FLASK_PORT,
-    #         ssl_context=ssl_context)
+    ssl_context = None
+    if config.SSL_CERT_PATH and config.SSL_KEY_PATH:
+        ssl_context = (config.SSL_CERT_PATH, config.SSL_KEY_PATH)
 
-    # if running behind reverse proxy like Nginx, ssl is not required by flask
-    app.run(host=config.FLASK_HOST, port=config.FLASK_PORT)
+    app.run(host=config.FLASK_HOST, port=config.FLASK_PORT, ssl_context=ssl_context)
