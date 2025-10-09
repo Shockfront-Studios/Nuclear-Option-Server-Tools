@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuclear Option Server Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .command-card {
+            margin-bottom: 1.5rem;
+        }
+        #response-area {
+            white-space: pre-wrap;
+            background-color: #e9ecef;
+            border: 1px solid #ced4da;
+            padding: 1rem;
+            min-height: 100px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <h1 class="mb-4">Nuclear Option Server Manager</h1>
+
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row">
+                    <!-- Command Forms -->
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Send Chat Message</h5>
+                                <form id="send-chat-message-form">
+                                    <div class="mb-3">
+                                        <label for="chat-message" class="form-label">Message</label>
+                                        <input type="text" class="form-control" id="chat-message" name="message" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Send</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Set Time Remaining</h5>
+                                <form id="set-time-remaining-form">
+                                    <div class="mb-3">
+                                        <label for="time-remaining" class="form-label">Time (seconds)</label>
+                                        <input type="number" class="form-control" id="time-remaining" name="time" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Set</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Kick Player</h5>
+                                <form id="kick-player-form">
+                                    <div class="mb-3">
+                                        <label for="kick-steam-id" class="form-label">Steam ID</label>
+                                        <input type="text" class="form-control" id="kick-steam-id" name="steam_id" required>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="kick-ban" name="ban">
+                                        <label class="form-check-label" for="kick-ban">
+                                            Ban Player
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger">Kick</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Ban Player</h5>
+                                <form id="ban-player-form">
+                                    <div class="mb-3">
+                                        <label for="ban-steam-id" class="form-label">Steam ID</label>
+                                        <input type="text" class="form-control" id="ban-steam-id" name="steam_id" required>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="ban-append" name="append">
+                                        <label class="form-check-label" for="ban-append">
+                                            Append to File
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-danger">Ban</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Unban Player</h5>
+                                <form id="unban-player-form">
+                                    <div class="mb-3">
+                                        <label for="unban-steam-id" class="form-label">Steam ID</label>
+                                        <input type="text" class="form-control" id="unban-steam-id" name="steam_id" required>
+                                    </div>
+                                    <div class="form-check mb-3">
+                                        <input class="form-check-input" type="checkbox" id="unban-remove" name="remove">
+                                        <label class="form-check-label" for="unban-remove">
+                                            Remove from File
+                                        </label>
+                                    </div>
+                                    <button type="submit" class="btn btn-warning">Unban</button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card command-card">
+                            <div class="card-body">
+                                <h5 class="card-title">Simple Commands</h5>
+                                <button class="btn btn-secondary" data-command="update-ready">Update Ready</button>
+                                <button class="btn btn-secondary" data-command="get-mission-time">Get Mission Time</button>
+                                <button class="btn btn-secondary" data-command="get-mission">Get Mission</button>
+                                <button class="btn btn-secondary" data-command="clear-kicked-players">Clear Kicked</button>
+                                <button class="btn btn-secondary" data-command="banlist-reload">Reload Banlist</button>
+                                <button class="btn btn-secondary" data-command="banlist-clear">Clear Banlist</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <h5>Server Response</h5>
+                <pre id="response-area">Awaiting command...</pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const path = window.location.pathname;
+        // If the path ends with /, remove it.
+        const base_path = path.endsWith('/') ? path.slice(0, -1) : path;
+        const responseArea = document.getElementById('response-area');
+
+        async function sendCommand(endpoint, body) {
+            try {
+                const response = await fetch(base_path + endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Basic Auth headers are handled by the browser
+                    },
+                    body: JSON.stringify(body)
+                });
+                const result = await response.json();
+                responseArea.textContent = JSON.stringify(result, null, 2);
+            } catch (error) {
+                responseArea.textContent = `Error: ${error.message}`;
+            }
+        }
+
+        document.getElementById('send-chat-message-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const message = formData.get('message');
+            sendCommand('/command/send-chat-message', { message });
+        });
+
+        document.getElementById('set-time-remaining-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const time = formData.get('time');
+            sendCommand('/command/set-time-remaining', { time });
+        });
+
+        document.getElementById('kick-player-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const steam_id = formData.get('steam_id');
+            const ban = formData.get('ban') === 'on';
+            sendCommand('/command/kick-player', { steam_id, ban });
+        });
+
+        document.getElementById('ban-player-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const steam_id = formData.get('steam_id');
+            const append = formData.get('append') === 'on';
+            sendCommand('/command/banlist-add', { steam_id, append });
+        });
+
+        document.getElementById('unban-player-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const steam_id = formData.get('steam_id');
+            const remove = formData.get('remove') === 'on';
+            sendCommand('/command/banlist-remove', { steam_id, remove });
+        });
+
+        document.querySelectorAll('[data-command]').forEach(button => {
+            button.addEventListener('click', function() {
+                const command = this.getAttribute('data-command');
+                sendCommand(`/command/${command}`, {});
+            });
+        });
+    </script>
+</body>
+</html>
