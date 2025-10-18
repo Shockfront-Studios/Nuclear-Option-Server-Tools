@@ -1,0 +1,26 @@
+# make sure user with name `steam` is created
+# copy of link service to systemd folder
+# sudo ln -s /home/steam/nuclear-option/ServerControlPanel/nuclear_option_server_control_panel.service /etc/systemd/system/
+# sudo systemctl daemon-reload
+# sudo systemctl enable --now nuclear_option_server_control_panel.service
+ 
+# IMPORTANT: make sure paths are correct before running
+
+[Unit]
+Description=Nuclear Option Server Control Panel
+After=network.target
+
+[Service]
+User=steam
+Group=steam
+
+WorkingDirectory=/home/steam/nuclear-option/ServerControlPanel
+ExecStart=/home/steam/nuclear-option/ServerControlPanel/run.sh
+
+# allow to restart 3 times in 2 mins
+Restart=always
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Install]
+WantedBy=multi-user.target
