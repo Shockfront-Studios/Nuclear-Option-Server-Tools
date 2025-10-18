@@ -81,3 +81,13 @@ Once configured, you can start the web panel using the provided run script:
 
 This will activate the virtual environment and start the Flask application. You can then access the web panel in your browser at the host and port you configured.
 
+### Running using systemctl
+
+The app can also be run with systemctl using the `nuclear_option_server_control_panel.service` config.
+- make sure paths inside the file are correct
+- copy service file to `/etc/systemd/system/`
+- reload and run
+```
+sudo systemctl daemon-reload
+sudo systemctl enable --now nuclear_option_server_control_panel.service
+```

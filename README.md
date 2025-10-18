@@ -4,4 +4,6 @@ This repository contains a collection of tools for managing a Nuclear Option ded
 
 ## Tools
 
--   **[AutoUpdater](./AutoUpdater/README.md)**: A tool to automatically check for updates for the game server and send a command to notify it.
+- **[AutoUpdater](./AutoUpdater/README.md)**: A tool to automatically check for updates for the game server and send a command to notify it.
+- **[ServerCommands](./ServerCommands/Readme.md)**: List of available server commands.
+- **[ServerControlPanel](./ServerControlPanel/README.md)**: A web-based control panel for managing the server.
