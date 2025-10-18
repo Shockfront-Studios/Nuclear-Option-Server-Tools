@@ -98,10 +98,15 @@ def set_time_remaining():
     data = request.get_json()
     time = data.get('time')
     if time is None:
-        return jsonify({'success': False, 'error': 'Time not provided'}), 400
+        return jsonify({'success': False, 'error': 'Time not provided.'}), 400
+    try:
+        time_float = float(time)
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'error': 'Invalid time format.'}), 400
+
     commander = create_remote_commander()
     success, response = server_commands.set_time_remaining(
-        commander, float(time))
+        commander, time_float)
     return jsonify({'success': success, 'response': response})
 
 
@@ -113,10 +118,15 @@ def set_next_mission():
     name = data.get('name')
     max_time = data.get('max_time')
     if not all([group, name, max_time]):
-        return jsonify({'success': False, 'error': 'Missing arguments'}), 400
+        return jsonify({'success': False, 'error': 'Missing parameters.'}), 400
+    try:
+        max_time_float = float(max_time)
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'error': 'Invalid time format.'}), 400
+
     commander = create_remote_commander()
     success, response = server_commands.set_next_mission(
-        commander, group, name, float(max_time))
+        commander, group, name, max_time_float)
     return jsonify({'success': success, 'response': response})
 
 
@@ -190,4 +200,5 @@ if __name__ == '__main__':
     if config.SSL_CERT_PATH and config.SSL_KEY_PATH:
         ssl_context = (config.SSL_CERT_PATH, config.SSL_KEY_PATH)
 
-    app.run(host=config.FLASK_HOST, port=config.FLASK_PORT, ssl_context=ssl_context)
+    app.run(host=config.FLASK_HOST, port=config.FLASK_PORT,
+            ssl_context=ssl_context)
