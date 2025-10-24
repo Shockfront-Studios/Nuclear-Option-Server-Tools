@@ -1,0 +1,111 @@
+## How to run server
+
+- **Install SteamCMD** 
+  - [instructions here](<https://developer.valvesoftware.com/wiki/SteamCMD>)
+  - create user called `steam` or change `force_install_dir` to be your full path 
+
+- **Install NuclearOptionServer**
+template: 
+```sh
+steamcmd +force_install_dir <install_dir> +login anonymous +app_update 3930080 -beta <branch> -betapassword <branch_pw> validate +quit
+```
+example:
+```sh
+steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +app_update 3930080 validate +quit
+```
+- **UDP ports** 
+  - (defaults, can be changed in `DedicatedServerConfig.json`)
+  - if running locally or behind firewall then these UDP ports might need to be opened to allow users to find and connect to the server
+  - game port `7777`
+  - query port `7778`
+
+- **Run Server (linux)**
+  - `cd NuclearOptionServer` enter the install directory
+  - `chmod +x NuclearOptionServer.x86_64` *set server as executable*
+  - `chmod +x RunServer.sh` *set the bash script as executable*
+  - `./RunServer.sh`
+    - `RunServer.sh` can be edited copied or modified to change how it is run
+
+- **Run Server (windows)**
+  - `cd NuclearOptionServer` enter the install directory
+  - `./RunServer.bat`
+    - `RunServer.bat` can be edited copied or modified to change how it is run
+  - or run manually using `NuclearOptionServer.exe -logFile server.log -limitframerate 30`
+
+- use `-DedicatedServer <json path>` argument to set custom config path
+  - on linux this should be added to `RunServer.sh` 
+
+- **Configure** `DedicatedServerConfig.json`
+  - After first running the server DedicatedServerConfig.json will be created with default values, you can then edit this to change the server settings
+
+
+example config
+```json
+{
+    "MissionDirectory": "/home/steam/NuclearOption-Missions",
+    "ModdedServer": false,
+    "ServerName": "Nuclear Option Server",
+    "Port": {
+        "IsOverride": false,
+        "Value": 0
+    },
+    "QueryPort": {
+        "IsOverride": false,
+        "Value": 0
+    },
+    "Password": "",
+    "MaxPlayers": 16,
+    "NoPlayerStopTime": 30.0,
+    "BanListPaths": [
+        "./banlist1.txt",
+        "./banlist2.txt"
+    ],
+    "RotationType": 0,
+    "MissionRotation": [
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Escalation"
+            },
+            "MaxTime": 7200.0
+        },
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Terminal Control"
+            },
+            "MaxTime": 7200.0
+        },
+        {
+            "Key": {
+                "Group": "User",
+                "Name": "Custom Mission"
+            },
+            "MaxTime": 7200.0
+        }
+    ]
+}
+```
+
+### Loading Missions
+
+Mission group options:
+- `Default` *loads from game files*
+- `Tutorial` *loads from game files*
+- `BuiltIn` *loads from game files*
+- `User` *loads from `MissionDirectory` folder*
+- ~~`Workshop`~~ *not implemented* (use `User` instead)
+
+when using `MissionDirectory`, mission will be loaded at path `<MissionDirectory>/<name>/<name>.json`.
+
+For example if `MissionDirectory` is `/home/steam/NuclearOption-Missions` and mission name is `test1` then the path will be `/home/steam/NuclearOption-Missions/test1/test1.json`
+
+**note:** MissionDirectory should be a full path
+
+#### Workshop missions
+- Download workshop items use steamcmd
+- copy the mission folder to `<MissionDirectory>`
+- use `User` in `DedicatedServerConfig.json`
+```sh
+steamcmd +force_install_dir <download_path> +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit 
+```
