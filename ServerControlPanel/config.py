@@ -1,8 +1,9 @@
 """Configuration for the Flask application."""
 
 # Game Server Configuration
-SERVER_HOST = "127.0.0.1"
-SERVER_PORT = 7779
+# what ports are game servers listening on?
+# add more ports if there are multiple servers on localhost
+SERVER_PORTS = [7779]
 
 # Web Application Configuration
 FLASK_HOST = "0.0.0.0"

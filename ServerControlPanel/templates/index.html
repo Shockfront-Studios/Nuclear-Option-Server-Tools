@@ -40,8 +40,6 @@
                     <!-- General Control Group -->
                     <h3 class="mb-3">General Control</h3>
                     <div class="row">
-                    </div>
-                    <div class="row">
                         <div class="col-md-12">
                             <div class="card command-card">
                                 <div class="card-body">
@@ -201,6 +199,19 @@
                 </div>
             </div>
             <div class="col-md-4">
+                <div class="card command-card mb-3">
+                    <div class="card-body">
+                        <h5 class="card-title">Server Connection</h5>
+                        <div class="mb-3">
+                            <label for="server-port" class="form-label">Server Port</label>
+                            <select class="form-select" id="server-port">
+                                {% for port in allowed_ports %}
+                                <option value="{{ port }}" {% if loop.first %}selected{% endif %}>{{ port }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
                 <h5>Server Response</h5>
                 <pre id="response-area">Awaiting command...</pre>
             </div>
@@ -212,23 +223,29 @@
         // If the path ends with /, remove it.
         const base_path = path.endsWith('/') ? path.slice(0, -1) : path;
         const responseArea = document.getElementById('response-area');
-
+        
         async function sendCommand(endpoint, body) {
             try {
+                // Get current server port from dropdown
+                const currentServerPort = parseInt(document.getElementById('server-port').value);
+                const commandBody = { ...body, server_port: currentServerPort };
+                
                 const response = await fetch(base_path + endpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         // Basic Auth headers are handled by the browser
                     },
-                    body: JSON.stringify(body)
+                    body: JSON.stringify(commandBody)
                 });
                 const result = await response.json();
-                responseArea.textContent = JSON.stringify(result, null, 2);
+                responseArea.textContent = `Server Port: ${currentServerPort}\n${JSON.stringify(result, null, 2)}`;
             } catch (error) {
-                responseArea.textContent = `Error: ${error.message}`;
+                const currentServerPort = parseInt(document.getElementById('server-port').value);
+                responseArea.textContent = `Server Port: ${currentServerPort}\nError: ${error.message}`;
             }
         }
+
 
         document.getElementById('send-chat-message-form').addEventListener('submit', function (e) {
             e.preventDefault();
