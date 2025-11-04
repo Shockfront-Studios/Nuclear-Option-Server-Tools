@@ -76,3 +76,8 @@ def banlist_remove(commander: RemoteCommander, steam_id: str):
 def banlist_clear(commander: RemoteCommander):
     """Clears the ban list loaded in the Authenticator."""
     return commander.send_command("banlist-clear")
+
+
+def get_player_list(commander: RemoteCommander):
+    """Retrieves the current connected player list from the server."""
+    return commander.send_command("get-player-list")

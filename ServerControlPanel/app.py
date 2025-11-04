@@ -141,6 +141,19 @@ def get_mission():
     return jsonify({'success': success, 'response': response})
 
 
+@app.route('/command/get-player-list', methods=['POST'])
+@requires_auth
+def get_player_list():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    success, response = server_commands.get_player_list(commander)
+    return jsonify({'success': success, 'response': response})
+
+
 @app.route('/command/set-time-remaining', methods=['POST'])
 @requires_auth
 def set_time_remaining():
