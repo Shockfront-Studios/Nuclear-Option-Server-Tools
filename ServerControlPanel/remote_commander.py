@@ -33,12 +33,14 @@ class RemoteCommander:
         self.host = host
         self.port = port
 
-    def send_command(self, command_name: str, arguments: List[str] = []) -> Tuple[bool, Optional[Dict]]:
+    def send_command(self, command_name: str, arguments: List[str] = []) -> Tuple[str, Optional[Dict]]:
         """
         Sends a command to the server and waits for the response.
         {"name": "command", "arguments": ["arg1"]}
 
-        Returns (success_bool, response_body_dict_or_None).
+        Returns (status_code_name, response_body_dict_or_None).
+        status_code_name is the name of the StatusCode enum (e.g., "Success", "BadRequest").
+        For network/parsing errors, returns descriptive error names like "NetworkError".
         """
         try:
             payload = {"name": command_name, "arguments": arguments}
@@ -54,12 +56,15 @@ class RemoteCommander:
 
         except (socket.error, OverflowError) as e:
             print(f"Network or connection error: {e}")
-            return False, None
+            return "NetworkError", None
 
-    def _receive_response(self, sock: socket.socket) -> Tuple[bool, Optional[Dict]]:
+    def _receive_response(self, sock: socket.socket) -> Tuple[str, Optional[Dict]]:
         """
         Handles receiving the response from the server.
         Format: 4 bytes status code | 4 bytes body length | JSON body (variable)
+        
+        Returns (status_code_name, response_body_dict_or_None).
+        status_code_name is the name of the StatusCode enum or an error name for parsing failures.
         """
         try:
             # Protocol uses little-endian ('<') 4-byte integers ('i')
@@ -68,16 +73,16 @@ class RemoteCommander:
 
         except ConnectionResetError as e:
             print(f"Error: Connection reset during header read. {e}")
-            return False, None
+            return "ConnectionError", None
         except struct.error:
             print("Error: Failed to unpack response header (corrupt data).")
-            return False, None
+            return "ParseError", None
 
         try:
             status_code = StatusCode(status_int)
         except ValueError:
             print(f"Error: Server returned unknown status code: {status_int}")
-            return False, None
+            return f"UnknownStatus_{status_int}", None
 
         data = None
         if body_length > 0:
@@ -89,24 +94,22 @@ class RemoteCommander:
                 except json.JSONDecodeError:
                     print(
                         "Error: Successfully received response, but failed to parse JSON body.")
-                    return False, None
+                    return f"{status_code.name}_JsonParseError", data
 
             except ConnectionResetError as e:
                 print(f"Error: Connection reset during body read. {e}")
-                return False, None
+                return f"{status_code.name}_ConnectionError", None
             except OverflowError:
                 print(
                     f"Error: Received body length ({body_length}) is too large.")
-                return False, None
+                return f"{status_code.name}_OverflowError", None
 
-        if status_code == StatusCode.Success:
-            return True, data
-        else:
-            print(
-                f"Server returned error code {status_code.value} ({status_code.name}).")
-            if data is not None:
-                print(f"Error body: {data}")
-            return False, None
+        # Return the status code name and the data (which may be None for errors)
+        print(
+            f"Server returned status code {status_code.value} ({status_code.name}).")
+        if data is not None and status_code != StatusCode.Success:
+            print(f"Error body: {data}")
+        return status_code.name, data
 
     def _recv_n(self, sock: socket.socket, n: int) -> bytes:
         """

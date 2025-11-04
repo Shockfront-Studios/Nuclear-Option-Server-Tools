@@ -81,8 +81,8 @@ def update_ready():
     if error:
         return error
 
-    success, response = server_commands.update_ready(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.update_ready(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/send-chat-message', methods=['POST'])
@@ -97,8 +97,8 @@ def send_chat_message():
     if error:
         return error
 
-    success, response = server_commands.send_chat_message(commander, message)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.send_chat_message(commander, message)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/reload-config', methods=['POST'])
@@ -111,8 +111,8 @@ def reload_config():
     if error:
         return error
 
-    success, response = server_commands.reload_config(commander, path)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.reload_config(commander, path)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/get-mission-time', methods=['POST'])
@@ -124,8 +124,8 @@ def get_mission_time():
     if error:
         return error
 
-    success, response = server_commands.get_mission_time(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.get_mission_time(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/get-mission', methods=['POST'])
@@ -137,8 +137,8 @@ def get_mission():
     if error:
         return error
 
-    success, response = server_commands.get_mission(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.get_mission(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/get-player-list', methods=['POST'])
@@ -150,8 +150,8 @@ def get_player_list():
     if error:
         return error
 
-    success, response = server_commands.get_player_list(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.get_player_list(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/set-time-remaining', methods=['POST'])
@@ -170,9 +170,9 @@ def set_time_remaining():
     if error:
         return error
 
-    success, response = server_commands.set_time_remaining(
+    status_code, response = server_commands.set_time_remaining(
         commander, time_float)
-    return jsonify({'success': success, 'response': response})
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/set-next-mission', methods=['POST'])
@@ -193,9 +193,9 @@ def set_next_mission():
     if error:
         return error
 
-    success, response = server_commands.set_next_mission(
+    status_code, response = server_commands.set_next_mission(
         commander, group, name, max_time_float)
-    return jsonify({'success': success, 'response': response})
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/kick-player', methods=['POST'])
@@ -210,8 +210,8 @@ def kick_player():
     if error:
         return error
 
-    success, response = server_commands.kick_player(commander, steam_id)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.kick_player(commander, steam_id)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/unkick-player', methods=['POST'])
@@ -226,8 +226,8 @@ def unkick_player():
     if error:
         return error
 
-    success, response = server_commands.unkick_player(commander, steam_id)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.unkick_player(commander, steam_id)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/clear-kicked-players', methods=['POST'])
@@ -239,8 +239,8 @@ def clear_kicked_players():
     if error:
         return error
 
-    success, response = server_commands.clear_kicked_players(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.clear_kicked_players(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/banlist-reload', methods=['POST'])
@@ -252,8 +252,8 @@ def banlist_reload():
     if error:
         return error
 
-    success, response = server_commands.banlist_reload(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.banlist_reload(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/banlist-add', methods=['POST'])
@@ -268,9 +268,9 @@ def banlist_add():
     if error:
         return error
 
-    success, response = server_commands.banlist_add(
+    status_code, response = server_commands.banlist_add(
         commander, steam_id)
-    return jsonify({'success': success, 'response': response})
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/banlist-remove', methods=['POST'])
@@ -285,9 +285,9 @@ def banlist_remove():
     if error:
         return error
 
-    success, response = server_commands.banlist_remove(
+    status_code, response = server_commands.banlist_remove(
         commander, steam_id)
-    return jsonify({'success': success, 'response': response})
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 @app.route('/command/banlist-clear', methods=['POST'])
@@ -299,8 +299,8 @@ def banlist_clear():
     if error:
         return error
 
-    success, response = server_commands.banlist_clear(commander)
-    return jsonify({'success': success, 'response': response})
+    status_code, response = server_commands.banlist_clear(commander)
+    return jsonify({'status_code': status_code, 'response': response})
 
 
 if __name__ == '__main__':
