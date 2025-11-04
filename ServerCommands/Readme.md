@@ -179,21 +179,32 @@ Sets the mission to be loaded next after the current one concludes.
 
 ### `kick-player`
 
-Kicks a player from the server and optionally adds them to the ban list.
+Kicks a player from the server.
 
 If kicked the player will be unable to rejoin until the server starts.
-
-If a second argument is given as `true` then they will also be added to the first ban list file, and they will remain unable to join even after server restart
 
 ```json
 {
     "name": "kick-player",
     "arguments": [
         "0123456789", // ulong SteamID to kick
-        "true" // (Optional) add id to ban list
     ]
 }
 ```
+
+### `unkick-player`
+
+Removes player from kick list, allowing them to rejoin.
+
+```json
+{
+    "name": "unkick-player",
+    "arguments": [
+        "0123456789", // ulong SteamID to kick
+    ]
+}
+```
+
 
 ### `clear-kicked-player`
 
@@ -210,7 +221,7 @@ Clears the list of kicked players allowing them to rejoin.
 
 Reloads the ban list from the list of files in server config. 
 
-Will only add new Ids, use `banlist-clear` before reload if you want to remove all ids first before loading the files again
+**NOTE:** Will only add new Ids, use `banlist-clear` before reload if you want to remove all ids first before loading the files again
 
 ```json
 {
@@ -221,39 +232,33 @@ Will only add new Ids, use `banlist-clear` before reload if you want to remove a
 
 ### `banlist-add`
 
-Adds a SteamID to the in-memory ban list and optionally appends it to the first configured ban file.
-
-If a second argument is given as `true` then the id will also be appended to the first ban list file
+Adds a SteamID to the ban list appends it to the first configured ban file.
 
 ```json
 {
     "name": "banlist-add",
     "arguments": [
         "0123456789", // ulong SteamID to ban
-        "true" // (Optional) append id to file
     ]
 }
 ```
 
 ### `banlist-remove`
 
-Removes a SteamID from the in-memory ban list and optionally removes it from the first configured ban file.
-
-If a second argument is given as `true` then the id will also be removed to the first ban list file
+Removes a SteamID from the ban list and from the first configured ban file
 
 ```json
 {
     "name": "banlist-remove",
     "arguments": [
         "0123456789", // ulong SteamID to unban
-        "true" // (Optional) remove id from file
     ]
 }
 ```
 
 ### `banlist-clear`
 
-Clears the ban list loaded in the Authenticator. This command does **not** modify any ban list files. 
+Clears the ban list loaded in the Authenticator. **NOTE:** This command does **not** modify any ban list files. 
 
 ```json
 {

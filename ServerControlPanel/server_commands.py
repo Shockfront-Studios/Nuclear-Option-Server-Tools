@@ -43,14 +43,19 @@ def set_next_mission(commander: RemoteCommander, group: str, name: str, max_time
     return commander.send_command("set-next-mission", [group, name, str(max_time)])
 
 
-def kick_player(commander: RemoteCommander, steam_id: str, ban: bool = False):
+def kick_player(commander: RemoteCommander, steam_id: str):
     """Kicks a player from the server and optionally adds them to the ban list."""
-    return commander.send_command("kick-player", [steam_id, str(ban).lower()])
+    return commander.send_command("kick-player", [steam_id])
+
+
+def unkick_player(commander: RemoteCommander, steam_id: str):
+    """Kicks a player from the server and optionally adds them to the ban list."""
+    return commander.send_command("unkick-player", [steam_id])
 
 
 def clear_kicked_players(commander: RemoteCommander):
     """Clears the list of kicked players allowing them to rejoin."""
-    return commander.send_command("clear-kicked-player")
+    return commander.send_command("clear-kicked-players")
 
 
 def banlist_reload(commander: RemoteCommander):
@@ -58,14 +63,14 @@ def banlist_reload(commander: RemoteCommander):
     return commander.send_command("banlist-reload")
 
 
-def banlist_add(commander: RemoteCommander, steam_id: str, append_to_file: bool = False):
+def banlist_add(commander: RemoteCommander, steam_id: str):
     """Adds a SteamID to the in-memory ban list and optionally appends it to the first configured ban file."""
-    return commander.send_command("banlist-add", [steam_id, str(append_to_file).lower()])
+    return commander.send_command("banlist-add", [steam_id])
 
 
-def banlist_remove(commander: RemoteCommander, steam_id: str, remove_from_file: bool = False):
+def banlist_remove(commander: RemoteCommander, steam_id: str):
     """Removes a SteamID from the in-memory ban list and optionally removes it from the first configured ban file."""
-    return commander.send_command("banlist-remove", [steam_id, str(remove_from_file).lower()])
+    return commander.send_command("banlist-remove", [steam_id])
 
 
 def banlist_clear(commander: RemoteCommander):

@@ -139,13 +139,22 @@
                                             <input type="text" class="form-control" id="kick-steam-id" name="steam_id"
                                                 required>
                                         </div>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" id="kick-ban" name="ban">
-                                            <label class="form-check-label" for="kick-ban">
-                                                Ban Player
-                                            </label>
-                                        </div>
                                         <button type="submit" class="btn btn-danger">Kick</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card command-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Unkick Player</h5>
+                                    <form id="unkick-player-form">
+                                        <div class="mb-3">
+                                            <label for="unkick-steam-id" class="form-label">Steam ID</label>
+                                            <input type="text" class="form-control" id="unkick-steam-id" name="steam_id"
+                                                required>
+                                        </div>
+                                        <button type="submit" class="btn btn-success">Unkick</button>
                                     </form>
                                 </div>
                             </div>
@@ -159,13 +168,6 @@
                                             <label for="ban-steam-id" class="form-label">Steam ID</label>
                                             <input type="text" class="form-control" id="ban-steam-id" name="steam_id"
                                                 required>
-                                        </div>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" id="ban-append"
-                                                name="append">
-                                            <label class="form-check-label" for="ban-append">
-                                                Append to File
-                                            </label>
                                         </div>
                                         <button type="submit" class="btn btn-danger">Ban</button>
                                     </form>
@@ -181,13 +183,6 @@
                                             <label for="unban-steam-id" class="form-label">Steam ID</label>
                                             <input type="text" class="form-control" id="unban-steam-id" name="steam_id"
                                                 required>
-                                        </div>
-                                        <div class="form-check mb-3">
-                                            <input class="form-check-input" type="checkbox" id="unban-remove"
-                                                name="remove">
-                                            <label class="form-check-label" for="unban-remove">
-                                                Remove from File
-                                            </label>
                                         </div>
                                         <button type="submit" class="btn btn-warning">Unban</button>
                                     </form>
@@ -274,24 +269,28 @@
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
-            const ban = formData.get('ban') === 'on';
-            sendCommand('/command/kick-player', { steam_id, ban });
+            sendCommand('/command/kick-player', { steam_id });
+        });
+
+        document.getElementById('unkick-player-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const steam_id = formData.get('steam_id');
+            sendCommand('/command/unkick-player', { steam_id });
         });
 
         document.getElementById('ban-player-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
-            const append = formData.get('append') === 'on';
-            sendCommand('/command/banlist-add', { steam_id, append });
+            sendCommand('/command/banlist-add', { steam_id });
         });
 
         document.getElementById('unban-player-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
-            const remove = formData.get('remove') === 'on';
-            sendCommand('/command/banlist-remove', { steam_id, remove });
+            sendCommand('/command/banlist-remove', { steam_id });
         });
 
         document.querySelectorAll('[data-command]').forEach(button => {
