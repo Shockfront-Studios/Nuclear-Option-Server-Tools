@@ -110,6 +110,21 @@
                                 </div>
                             </div>
                         </div>
+                        <div class="col-md-6">
+                            <div class="card command-card">
+                                <div class="card-body">
+                                    <h5 class="card-title">Reload Config</h5>
+                                    <form id="reload-config-form">
+                                        <div class="mb-3">
+                                            <label for="config-path" class="form-label">Config Path (optional)</label>
+                                            <input type="text" class="form-control" id="config-path" name="path"
+                                                placeholder="Leave empty to reload default config">
+                                        </div>
+                                        <button type="submit" class="btn btn-primary">Reload</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Banning & Kicking Group -->
@@ -265,6 +280,14 @@
             const name = formData.get('name');
             const max_time = formData.get('max_time');
             sendCommand('/command/set-next-mission', { group, name, max_time });
+        });
+
+        document.getElementById('reload-config-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const path = formData.get('path');
+            const body = path ? { path } : {};
+            sendCommand('/command/reload-config', body);
         });
 
         document.getElementById('kick-player-form').addEventListener('submit', function (e) {
