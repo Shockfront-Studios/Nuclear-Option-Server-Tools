@@ -87,6 +87,16 @@ example config
 }
 ```
 
+### Mission Rotation
+
+The `RotationType` field can be changed to tell the server in what order to play the missions. Set the value to one of the following numeric codes:
+
+| Value | Rotation Method | Description |
+| :---: | :--- | :--- |
+| `0` | **Sequence** | Missions are selected in the order. |
+| `1` | **Pure Random** | Each missions is selected at random, allowing for immediate repeats. |
+| `2` | **Random Queue** | Missions are shuffled and selected in that random order, guaranteeing that all missions are played before the shuffle repeats. |
+
 ### Loading Missions
 
 Mission group options:
