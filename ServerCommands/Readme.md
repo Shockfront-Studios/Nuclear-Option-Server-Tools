@@ -149,6 +149,36 @@ Retrieves the currently running mission and the next mission scheduled.
 }
 ```
 
+### `get-player-list`
+
+Retrieves the current connected player list from the server.
+
+```json
+{
+    "name": "get-player-list",
+    "arguments": []
+}
+```
+
+#### Response
+
+```json
+{
+    "Players": [
+        {
+            "steamId": "0123456789",
+            "displayName": "PlayerOne",
+            "faction": "Boscali"
+        },
+        {
+            "steamId": "9876543210",
+            "displayName": "PlayerTwo",
+            "faction": "Primeva"
+        }
+    ]
+}
+```
+
 ### `set-time-remaining`
 
 Sets the remaining time for the current mission, in seconds
@@ -206,13 +236,13 @@ Removes player from kick list, allowing them to rejoin.
 ```
 
 
-### `clear-kicked-player`
+### `clear-kicked-players`
 
 Clears the list of kicked players allowing them to rejoin.
 
 ```json
 {
-    "name": "clear-kicked-player",
+    "name": "clear-kicked-players",
     "arguments": []
 }
 ```
