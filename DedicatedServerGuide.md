@@ -1,7 +1,7 @@
 ## How to run server
 
 - **Install SteamCMD** 
-  - [instructions here](<https://developer.valvesoftware.com/wiki/SteamCMD>)
+  - instructions: https://developer.valvesoftware.com/wiki/SteamCMD
   - create user called `steam` or change `force_install_dir` to be your full path 
 
 - **Install NuclearOptionServer**
@@ -112,10 +112,17 @@ For example if `MissionDirectory` is `/home/steam/NuclearOption-Missions` and mi
 
 **note:** MissionDirectory should be a full path
 
+**Important:** The mission folder name must exactly match the mission JSON file's base name.  
+For example, for a mission named `test1`, the folder must be `.../test1/` and the file must be `.../test1/test1.json`. If these names do not match, the mission will not load.
+
 #### Workshop missions
-- Download workshop items use steamcmd
-- copy the mission folder to `<MissionDirectory>`
-- use `User` in `DedicatedServerConfig.json`
+- Download workshop items using steamcmd. You must log in with a Steam account that owns NuclearOption (see [SteamCmd](https://developer.valvesoftware.com/wiki/SteamCMD)). Anonymous login cannot access Workshop content.
+- After download, copy the mission folder to `<MissionDirectory>` and **ensure the folder name matches the mission JSON file** name as noted above.
+- Use `User` group in `DedicatedServerConfig.json`.
+
+Login and download (interactive login; you'll be prompted for password/Steam Guard):
 ```sh
-steamcmd +force_install_dir <download_path> +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit 
+steamcmd +login <your_steam_username> +workshop_download_item 2168680 <WorkshopID> +quit
 ```
+
+By default, Workshop files are placed under `.../steamapps/workshop/content/2168680/<WorkshopID>/`. Locate the mission folder within that directory, copy it into your `<MissionDirectory>`, and verify the folder name exactly matches the mission's JSON filename.
