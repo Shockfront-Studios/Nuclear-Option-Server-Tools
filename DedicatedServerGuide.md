@@ -18,6 +18,8 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
   - if running locally or behind firewall then these UDP ports might need to be opened to allow users to find and connect to the server
   - game port `7777`
   - query port `7778`
+ 
+  Note: If you are absolutely sure that your port forwarding settings are correct yet you cannot see your server listed in the game, check if your router has NAT reflection enabled on your port. This issue usually occurs when it's disabled and you're in the same network as the server. However, not all routers will have an option to enable NAT reflection at all.
 
 - **Run Server (linux)**
   - `cd NuclearOptionServer` enter the install directory
