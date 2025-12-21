@@ -15,6 +15,7 @@ def get_latest_build_id(app_id, branch, install_dir):
     try:
         command = [
             "/usr/games/steamcmd",
+            "+force_install_dir", install_dir,
             "+login", "anonymous",
             "+app_info_print", app_id,
             "+quit"
