@@ -126,3 +126,27 @@ steamcmd +login <your_steam_username> +workshop_download_item 2168680 <WorkshopI
 ```
 
 By default, Workshop files are placed under `.../steamapps/workshop/content/2168680/<WorkshopID>/`. Locate the mission folder within that directory, copy it into your `<MissionDirectory>`, and verify the folder name exactly matches the mission's JSON filename.
+
+
+## Troubleshooting
+
+### Check if server started correctly
+
+With the default run arguments the server will create log files in the `logs` directory with the timestamp the server was started. (`./logs/server-$(date +%Y-%m-%d-%H-%M-%S).log`). Checking these log files will help tell you if the server started correctly.
+
+If you see this line, it is likely the server is running ok: `[DedicatedServerManager] Waiting for Players before loading next map`.
+
+
+### Steam Server Query
+
+To check if your server is accessible on the query point, there are two ways:
+1.  **Using a Steam server query tool:** Various online tools and applications allow you to query Steam servers directly. Provide your server's IP address and query port (default `7778`) to these tools. (example tool: https://saraserenity.net/steam/server_query.php)
+
+2.  **Using the in-game server list:** Attempt to find your server in the game's server browser. If it doesn't appear, check your client-side log files (`%USERPROFILE%\AppData\LocalLow\Shockfront\NuclearOption\Player.log`) for entries like:
+    `[Warn] Request Server List, fail index:<i>, Query Address:<ip>:<query port>`
+    where `<ip>` and `<query port>` correspond to your server's details.
+
+
+### NAT Reflection (running server on the same network as client)
+
+If you are absolutely sure that your port forwarding settings are correct yet you cannot see your server listed in the game, check if your router has NAT reflection enabled on your port. This issue usually occurs when it's disabled and you're in the same network as the server. However, not all routers will have an option to enable NAT reflection at all.
