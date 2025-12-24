@@ -186,6 +186,10 @@
                                             <input type="text" class="form-control" id="ban-steam-id" name="steam_id"
                                                 required>
                                         </div>
+                                        <div class="mb-3">
+                                            <label for="ban-reason" class="form-label">Reason (optional)</label>
+                                            <input type="text" class="form-control" id="ban-reason" name="reason">
+                                        </div>
                                         <button type="submit" class="btn btn-danger">Ban</button>
                                     </form>
                                 </div>
@@ -308,7 +312,8 @@
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
-            sendCommand('/command/banlist-add', { steam_id });
+            const reason = formData.get('reason');
+            sendCommand('/command/banlist-add', { steam_id, reason });
         });
 
         document.getElementById('unban-player-form').addEventListener('submit', function (e) {

@@ -63,9 +63,12 @@ def banlist_reload(commander: RemoteCommander):
     return commander.send_command("banlist-reload")
 
 
-def banlist_add(commander: RemoteCommander, steam_id: str):
+def banlist_add(commander: RemoteCommander, steam_id: str, reason: Optional[str] = None):
     """Adds a SteamID to the in-memory ban list and optionally appends it to the first configured ban file."""
-    return commander.send_command("banlist-add", [steam_id])
+    args = [steam_id]
+    if reason:
+        args.append(reason)
+    return commander.send_command("banlist-add", args)
 
 
 def banlist_remove(commander: RemoteCommander, steam_id: str):

@@ -269,6 +269,7 @@ Adds a SteamID to the ban list appends it to the first configured ban file.
     "name": "banlist-add",
     "arguments": [
         "0123456789", // ulong SteamID to ban
+        "cheating", // optional reason
     ]
 }
 ```

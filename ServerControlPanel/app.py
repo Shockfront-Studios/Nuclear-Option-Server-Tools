@@ -261,6 +261,7 @@ def banlist_reload():
 def banlist_add():
     data = request.get_json()
     steam_id = data.get('steam_id')
+    reason = data.get('reason')
     if not steam_id:
         return jsonify({'success': False, 'error': 'Steam ID not provided'}), 400
 
@@ -269,7 +270,7 @@ def banlist_add():
         return error
 
     status_code, response = server_commands.banlist_add(
-        commander, steam_id)
+        commander, steam_id, reason)
     return jsonify({'status_code': status_code, 'response': response})
 
 
