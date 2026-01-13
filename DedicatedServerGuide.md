@@ -44,6 +44,7 @@ example config
 {
     "MissionDirectory": "/home/steam/NuclearOption-Missions",
     "ModdedServer": false,
+    "Hidden": false,
     "ServerName": "Nuclear Option Server",
     "Port": {
         "IsOverride": false,
