@@ -39,7 +39,7 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
   - After first running the server DedicatedServerConfig.json will be created with default values, you can then edit this to change the server settings
 
 
-example config
+### Example config
 ```json
 {
     "MissionDirectory": "/home/steam/NuclearOption-Missions",
