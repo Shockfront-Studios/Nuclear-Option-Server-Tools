@@ -7,10 +7,12 @@
     <title>Nuclear Option Server Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        html, body {
+        html,
+        body {
             height: 100%;
             overflow: hidden;
         }
+
         body {
             background-color: #f8f9fa;
         }
@@ -25,6 +27,47 @@
             border: 1px solid #ced4da;
             padding: 1rem;
             min-height: 100px;
+        }
+
+        .response-container {
+            position: relative;
+        }
+
+        .command-info {
+            background-color: #dee2e6;
+            padding: 0.5rem;
+            border-radius: 4px;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .command-name {
+            font-weight: bold;
+            color: #0d6efd;
+        }
+
+        .command-timestamp {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.7);
+            }
+
+            50% {
+                box-shadow: 0 0 0 10px rgba(13, 110, 253, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(13, 110, 253, 0);
+            }
+        }
+
+        .response-pulse {
+            animation: pulse 0.6s ease-out;
         }
     </style>
 </head>
@@ -229,7 +272,13 @@
                     </div>
                 </div>
                 <h5>Server Response</h5>
-                <pre id="response-area">Awaiting command...</pre>
+                <div class="response-container">
+                    <div id="command-info" class="command-info" style="display: none;">
+                        <span class="command-name" id="command-name-display"></span>
+                        <span class="command-timestamp" id="command-timestamp-display"></span>
+                    </div>
+                    <pre id="response-area">Awaiting command...</pre>
+                </div>
             </div>
         </div>
     </div>
@@ -239,13 +288,49 @@
         // If the path ends with /, remove it.
         const base_path = path.endsWith('/') ? path.slice(0, -1) : path;
         const responseArea = document.getElementById('response-area');
-        
+        const commandInfo = document.getElementById('command-info');
+        const commandNameDisplay = document.getElementById('command-name-display');
+        const commandTimestampDisplay = document.getElementById('command-timestamp-display');
+
+        function formatCommandName(endpoint) {
+            // Extract command name from endpoint like '/command/send-chat-message'
+            const parts = endpoint.split('/');
+            const commandName = parts[parts.length - 1];
+            // Convert kebab-case to Title Case
+            return commandName
+                .split('-')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ');
+        }
+
+        function formatTimestamp() {
+            const now = new Date();
+            return now.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+        }
+
         async function sendCommand(endpoint, body) {
+            // Get current server port from dropdown
+            const currentServerPort = parseInt(document.getElementById('server-port').value);
+
+            // Immediately update UI to show command is running
+            commandNameDisplay.textContent = formatCommandName(endpoint);
+            commandTimestampDisplay.textContent = formatTimestamp();
+            commandInfo.style.display = 'block';
+            responseArea.textContent = `Server Port: ${currentServerPort}\nLoading...`;
+
+            // Add pulse animation for the loading state
+            responseArea.classList.remove('response-pulse');
+            void responseArea.offsetWidth;
+            responseArea.classList.add('response-pulse');
+
             try {
-                // Get current server port from dropdown
-                const currentServerPort = parseInt(document.getElementById('server-port').value);
                 const commandBody = { ...body, server_port: currentServerPort };
-                
+
                 const response = await fetch(base_path + endpoint, {
                     method: 'POST',
                     headers: {
@@ -255,10 +340,28 @@
                     body: JSON.stringify(commandBody)
                 });
                 const result = await response.json();
+
+                // Update timestamp again when response is received
+                commandTimestampDisplay.textContent = formatTimestamp();
+
+                // Update response
                 responseArea.textContent = `Server Port: ${currentServerPort}\n${JSON.stringify(result, null, 2)}`;
+
+                // Add pulse animation for the response
+                responseArea.classList.remove('response-pulse');
+                void responseArea.offsetWidth;
+                responseArea.classList.add('response-pulse');
+
             } catch (error) {
-                const currentServerPort = parseInt(document.getElementById('server-port').value);
+                // Update timestamp when error is received
+                commandTimestampDisplay.textContent = formatTimestamp();
+
                 responseArea.textContent = `Server Port: ${currentServerPort}\nError: ${error.message}`;
+
+                // Add pulse animation for errors
+                responseArea.classList.remove('response-pulse');
+                void responseArea.offsetWidth;
+                responseArea.classList.add('response-pulse');
             }
         }
 
