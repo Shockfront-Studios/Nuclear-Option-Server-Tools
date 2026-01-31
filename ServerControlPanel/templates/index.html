@@ -21,16 +21,43 @@
             margin-bottom: 1.5rem;
         }
 
+        .response-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            min-height: 0;
+        }
+
         #response-area {
             white-space: pre-wrap;
             background-color: #e9ecef;
             border: 1px solid #ced4da;
             padding: 1rem;
+            flex-grow: 1;
+            overflow-y: auto;
+            overflow-x: auto;
+            border-radius: 4px;
             min-height: 100px;
         }
 
-        .response-container {
-            position: relative;
+        #response-area::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        #response-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+
+        #response-area::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 4px;
+        }
+
+        #response-area::-webkit-scrollbar-thumb:hover {
+            background: #999;
         }
 
         .command-info {
@@ -257,7 +284,7 @@
 
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-4" style="max-height: calc(100vh - 150px); display: flex; flex-direction: column;">
                 <div class="card command-card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">Server Connection</h5>
