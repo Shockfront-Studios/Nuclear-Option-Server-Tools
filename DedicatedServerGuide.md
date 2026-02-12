@@ -39,7 +39,7 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
   - After first running the server DedicatedServerConfig.json will be created with default values, you can then edit this to change the server settings
 
 
-### Example config
+### Default Config
 ```json
 {
     "MissionDirectory": "/home/steam/NuclearOption-Missions",
@@ -56,11 +56,13 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
     },
     "Password": "",
     "MaxPlayers": 16,
-    "NoPlayerStopTime": 30.0,
     "BanListPaths": [
-        "./banlist1.txt",
-        "./banlist2.txt"
+        "ban_list.txt"
     ],
+    "DisableErrorKick": false,
+    "ErrorKickImmuneListPaths": [],
+    "NoPlayerStopTime": 30.0,
+    "PostMissionDelay": 30.0,
     "RotationType": 0,
     "MissionRotation": [
         {
@@ -76,16 +78,121 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
                 "Name": "Terminal Control"
             },
             "MaxTime": 7200.0
-        },
-        {
-            "Key": {
-                "Group": "User",
-                "Name": "Custom Mission"
-            },
-            "MaxTime": 7200.0
         }
     ]
 }
+```
+
+#### Config Settings
+
+**MissionDirectory**
+The absolute path where the server will look for custom missions (when using `User` or `Workshop` groups).
+- **Linux example**: `"/home/steam/NuclearOption-Missions"`
+- **Windows example**: `"C:/Games/NuclearOption-Missions"`
+```json
+"MissionDirectory": "C:/Games/NuclearOption-Missions"
+```
+
+**ServerName**
+The name that will be displayed in the public server list.
+```json
+"ServerName": "My Nuclear Option Server"
+```
+
+**MaxPlayers**
+The maximum number of players allowed on the server.
+Counts over 16 will display a performance warning to players in the server list. Ensure your server hardware can handle the increased load if setting this higher.
+```json
+"MaxPlayers": 16
+```
+
+**Password**
+If set, players must enter this password to join the server. Setting this to an empty string (`""`) means No Password will be required.
+```json
+"Password": ""
+```
+
+**Port and QueryPort**
+The server uses an override system for ports. `IsOverride` must be set to `true` for the `Value` to be used; otherwise, the server will use its default ports (7777 and 7778).
+```json
+"Port": {
+    "IsOverride": true,
+    "Value": 7777
+},
+"QueryPort": {
+    "IsOverride": true,
+    "Value": 7778
+}
+```
+
+**BanListPaths**
+A list of file paths (relative to the server executable or absolute) that contain lists of SteamIDs to block from joining.
+```json
+"BanListPaths": [
+    "ban_list.txt",
+    "global_bans.txt"
+]
+```
+
+**DisableErrorKick**
+By default, the server kicks players who cause errors to prevent instability. Set this to `true` to disable this behavior for all players.
+```json
+"DisableErrorKick": true
+```
+
+**ErrorKickImmuneListPaths**
+A list of file paths containing SteamIDs of players who should never be kicked for errors, even if `DisableErrorKick` is `false`.
+```json
+"ErrorKickImmuneListPaths": [
+    "admins.txt"
+]
+```
+
+**NoPlayerStopTime**
+The time in seconds the server will wait after the last player leaves before unloading the current mission.
+```json
+"NoPlayerStopTime": 60.0
+```
+
+**PostMissionDelay**
+The time in seconds the server waits after a mission ends (via the EndGame outcome in a mission) before loading the next mission in the rotation.
+```json
+"PostMissionDelay": 30.0
+```
+
+**Hidden**
+If `true`, the server will not appear in the public server list.
+```json
+"Hidden": false
+```
+
+**ModdedServer**
+Should be set to `true` if you are running custom server-side mods that may affect user experience or gameplay.
+```json
+"ModdedServer": false
+```
+
+**MissionRotation**
+A list of missions the server will cycle through. Each entry contains a `Key` (Group and Name) and a `MaxTime` in seconds.
+- `Group` / `Name`: Identifies the mission to load. For more details on the available groups and how mission names are used, see [Loading Missions](#loading-missions).
+- `MaxTime`: The maximum duration of the mission in seconds.
+```json
+"MissionRotation": [
+    {
+        "Key": {
+            "Group": "BuiltIn",
+            "Name": "Escalation"
+        },
+        "MaxTime": 7200.0
+    },
+    {
+        "Key": {
+            "Group": "User",
+            "Name": "Custom Mission"
+        },
+        "MaxTime": 7200.0
+    }
+]
 ```
 
 ### Mission Rotation
