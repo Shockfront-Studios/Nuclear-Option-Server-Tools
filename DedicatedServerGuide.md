@@ -224,16 +224,25 @@ For example if `MissionDirectory` is `/home/steam/NuclearOption-Missions` and mi
 For example, for a mission named `test1`, the folder must be `.../test1/` and the file must be `.../test1/test1.json`. If these names do not match, the mission will not load.
 
 #### Workshop missions
-- Download workshop items using steamcmd. You must log in with a Steam account that owns NuclearOption (see [SteamCmd](https://developer.valvesoftware.com/wiki/SteamCMD)). Anonymous login cannot access Workshop content.
+- Download workshop items using steamcmd. Anonymous login is supported for accessing Workshop content.
 - After download, copy the mission folder to `<MissionDirectory>` and **ensure the folder name matches the mission JSON file** name as noted above.
 - Use `User` group in `DedicatedServerConfig.json`.
 
-Login and download (interactive login; you'll be prompted for password/Steam Guard):
+Download command (Anonymous):
 ```sh
-steamcmd +login <your_steam_username> +workshop_download_item 2168680 <WorkshopID> +quit
+steamcmd +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit
+```
+Or specifying a download directory:
+```sh
+steamcmd +force_install_dir <install_dir> +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit
 ```
 
-By default, Workshop files are placed under `.../steamapps/workshop/content/2168680/<WorkshopID>/`. Locate the mission folder within that directory, copy it into your `<MissionDirectory>`, and verify the folder name exactly matches the mission's JSON filename.
+Workshop files are always placed inside a Steam directory structure: `<install_dir>/steamapps/workshop/content/2168680/<WorkshopID>/`. 
+For example, if you use `+force_install_dir /home/steam/nuclear-option/Missions`, the files will be downloaded to `/home/steam/nuclear-option/Missions/steamapps/workshop/content/2168680/<WorkshopID>/`.
+
+The downloaded folder will be named after the `<WorkshopID>` (e.g., `3669299832`). You **must rename this folder** to exactly match the base name of the mission's `.json` file inside it when moving it to your `<MissionDirectory>`.
+
+For example, if the workshop folder contains `MyCustomMission.json`, you must rename the folder from `3669299832` to `MyCustomMission`, resulting in the path: `<MissionDirectory>/MyCustomMission/MyCustomMission.json`.
 
 
 ## Troubleshooting
