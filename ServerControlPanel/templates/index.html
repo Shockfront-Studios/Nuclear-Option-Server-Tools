@@ -96,6 +96,75 @@
         .response-pulse {
             animation: pulse 0.6s ease-out;
         }
+
+        #server-list {
+            max-height: 280px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            background-color: #fff;
+        }
+
+        .server-item {
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .server-item:last-child {
+            border-bottom: none;
+        }
+
+        .server-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .server-item.selected {
+            background-color: #e7f1ff;
+            border-left: 4px solid #0d6efd;
+        }
+
+        .server-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-port {
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        .server-id {
+            font-size: 0.8rem;
+            color: #6c757d;
+            font-family: monospace;
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-weight: bold;
+        }
+
+        .status-online {
+            background-color: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .status-offline {
+            background-color: #f8d7da;
+            color: #842029;
+        }
+
+        .status-checking {
+            background-color: #fff3cd;
+            color: #664d03;
+        }
     </style>
 </head>
 
@@ -122,6 +191,8 @@
                                         Mission</button>
                                     <button class="btn btn-secondary p-2" data-command="get-player-list">Get Player
                                         List</button>
+                                    <button class="btn btn-secondary p-2" data-command="get-server-id">Get Server
+                                        ID</button>
                                 </div>
                             </div>
                         </div>
@@ -287,14 +358,20 @@
             <div class="col-md-4" style="max-height: calc(100vh - 150px); display: flex; flex-direction: column;">
                 <div class="card command-card mb-3">
                     <div class="card-body">
-                        <h5 class="card-title">Server Connection</h5>
-                        <div class="mb-3">
-                            <label for="server-port" class="form-label">Server Port</label>
-                            <select class="form-select" id="server-port">
-                                {% for port in allowed_ports %}
-                                <option value="{{ port }}" {% if loop.first %}selected{% endif %}>{{ port }}</option>
-                                {% endfor %}
-                            </select>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="card-title mb-0">Server Connection</h5>
+                            <button class="btn btn-sm btn-outline-secondary" onclick="refreshAllServerStatuses()">Refresh All</button>
+                        </div>
+                        <div id="server-list">
+                            {% for port in allowed_ports %}
+                            <div class="server-item" data-port="{{ port }}" onclick="selectServer({{ port }})">
+                                <div class="server-info">
+                                    <span class="server-port">Port: {{ port }}</span>
+                                    <span class="server-id" id="id-{{ port }}">Steam ID: ...</span>
+                                </div>
+                                <span class="status-badge status-checking" id="status-{{ port }}">Checking</span>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -319,6 +396,8 @@
         const commandNameDisplay = document.getElementById('command-name-display');
         const commandTimestampDisplay = document.getElementById('command-timestamp-display');
 
+        let selectedPort = null;
+
         function formatCommandName(endpoint) {
             // Extract command name from endpoint like '/command/send-chat-message'
             const parts = endpoint.split('/');
@@ -340,15 +419,67 @@
             });
         }
 
+        function selectServer(port) {
+            selectedPort = port;
+
+            // Update UI
+            document.querySelectorAll('.server-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            const selectedItem = document.querySelector(`.server-item[data-port="${port}"]`);
+            if (selectedItem) {
+                selectedItem.classList.add('selected');
+            }
+        }
+
+        async function updateServerStatus(port) {
+            const statusBadge = document.getElementById(`status-${port}`);
+            const idSpan = document.getElementById(`id-${port}`);
+
+            statusBadge.textContent = 'Checking';
+            statusBadge.className = 'status-badge status-checking';
+
+            try {
+                const response = await fetch(base_path + '/command/get-server-id', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ server_port: port })
+                });
+
+                const result = await response.json();
+
+                if (result.status_code === 'Success') {
+                    statusBadge.textContent = 'Online';
+                    statusBadge.className = 'status-badge status-online';
+                    idSpan.textContent = `Steam ID: ${result.response.serverId}`;
+                } else {
+                    throw new Error('Offline');
+                }
+            } catch (error) {
+                statusBadge.textContent = 'Offline';
+                statusBadge.className = 'status-badge status-offline';
+                idSpan.textContent = 'Steam ID: N/A';
+            }
+        }
+
+        function refreshAllServerStatuses() {
+            document.querySelectorAll('.server-item').forEach(item => {
+                const port = parseInt(item.getAttribute('data-port'));
+                updateServerStatus(port);
+            });
+        }
+
         async function sendCommand(endpoint, body) {
-            // Get current server port from dropdown
-            const currentServerPort = parseInt(document.getElementById('server-port').value);
+            if (selectedPort === null) {
+                alert('Please select a server first.');
+                return;
+            }
 
             // Immediately update UI to show command is running
             commandNameDisplay.textContent = formatCommandName(endpoint);
             commandTimestampDisplay.textContent = formatTimestamp();
             commandInfo.style.display = 'block';
-            responseArea.textContent = `Server Port: ${currentServerPort}\nLoading...`;
+            responseArea.textContent = `Server Port: ${selectedPort}\nLoading...`;
 
             // Add pulse animation for the loading state
             responseArea.classList.remove('response-pulse');
@@ -356,7 +487,7 @@
             responseArea.classList.add('response-pulse');
 
             try {
-                const commandBody = { ...body, server_port: currentServerPort };
+                const commandBody = { ...body, server_port: selectedPort };
 
                 const response = await fetch(base_path + endpoint, {
                     method: 'POST',
@@ -372,18 +503,33 @@
                 commandTimestampDisplay.textContent = formatTimestamp();
 
                 // Update response
-                responseArea.textContent = `Server Port: ${currentServerPort}\n${JSON.stringify(result, null, 2)}`;
+                responseArea.textContent = `Server Port: ${selectedPort}\n${JSON.stringify(result, null, 2)}`;
 
                 // Add pulse animation for the response
                 responseArea.classList.remove('response-pulse');
                 void responseArea.offsetWidth;
                 responseArea.classList.add('response-pulse');
 
+                // If command was get-server-id, update the specific server item too
+                if (endpoint === '/command/get-server-id') {
+                    const statusBadge = document.getElementById(`status-${selectedPort}`);
+                    const idSpan = document.getElementById(`id-${selectedPort}`);
+                    if (result.status_code === 'Success') {
+                        statusBadge.textContent = 'Online';
+                        statusBadge.className = 'status-badge status-online';
+                        idSpan.textContent = `Steam ID: ${result.response.serverId}`;
+                    } else {
+                        statusBadge.textContent = 'Offline';
+                        statusBadge.className = 'status-badge status-offline';
+                        idSpan.textContent = 'Steam ID: N/A';
+                    }
+                }
+
             } catch (error) {
                 // Update timestamp when error is received
                 commandTimestampDisplay.textContent = formatTimestamp();
 
-                responseArea.textContent = `Server Port: ${currentServerPort}\nError: ${error.message}`;
+                responseArea.textContent = `Server Port: ${selectedPort}\nError: ${error.message}`;
 
                 // Add pulse animation for errors
                 responseArea.classList.remove('response-pulse');
@@ -458,6 +604,18 @@
                 const command = this.getAttribute('data-command');
                 sendCommand(`/command/${command}`, {});
             });
+        });
+
+        // Initial setup
+        window.addEventListener('load', function () {
+            refreshAllServerStatuses();
+
+            // Select first server by default
+            const firstServer = document.querySelector('.server-item');
+            if (firstServer) {
+                const port = parseInt(firstServer.getAttribute('data-port'));
+                selectServer(port);
+            }
         });
     </script>
 </body>

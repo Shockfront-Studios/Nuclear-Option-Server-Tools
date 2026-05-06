@@ -149,6 +149,25 @@ Retrieves the currently running mission and the next mission scheduled.
 }
 ```
 
+### `get-server-id`
+
+Retrieves the Steam ID of the server.
+
+```json
+{
+    "name": "get-server-id",
+    "arguments": []
+}
+```
+
+#### Response
+
+```json
+{
+    "serverId": "01234567891234567"
+}
+```
+
 ### `get-player-list`
 
 Retrieves the current connected player list from the server.

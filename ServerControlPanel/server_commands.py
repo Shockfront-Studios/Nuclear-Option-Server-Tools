@@ -84,3 +84,8 @@ def banlist_clear(commander: RemoteCommander):
 def get_player_list(commander: RemoteCommander):
     """Retrieves the current connected player list from the server."""
     return commander.send_command("get-player-list")
+
+
+def get_server_id(commander: RemoteCommander):
+    """Retrieves the Steam ID of the server."""
+    return commander.send_command("get-server-id")

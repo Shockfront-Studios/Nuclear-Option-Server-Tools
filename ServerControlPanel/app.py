@@ -154,6 +154,19 @@ def get_player_list():
     return jsonify({'status_code': status_code, 'response': response})
 
 
+@app.route('/command/get-server-id', methods=['POST'])
+@requires_auth
+def get_server_id():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.get_server_id(commander)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
 @app.route('/command/set-time-remaining', methods=['POST'])
 @requires_auth
 def set_time_remaining():
