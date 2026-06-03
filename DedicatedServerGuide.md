@@ -79,7 +79,17 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
             },
             "MaxTime": 7200.0
         }
-    ]
+    ],
+    "VoteKick": {
+        "Enabled": true,
+        "PassRatio": 0.6,
+        "MinVotes": 3,
+        "AutoBanThreshold": 3,
+        "VoteDuration": 45.0,
+        "ResolutionDisplayTime": 20.0,
+        "NewVoteLockout": 10.0,
+        "RequesterCooldown": 300.0
+    }
 }
 ```
 
@@ -193,6 +203,30 @@ A list of missions the server will cycle through. Each entry contains a `Key` (G
         "MaxTime": 7200.0
     }
 ]
+```
+
+**VoteKick**
+Configures the vote-kick feature for players on the server. When a player is successfully vote-kicked, they are blocked from rejoining for the duration of the current mission, but are allowed to rejoin when the next mission starts.
+
+- **Enabled**: If `true`, players are allowed to start vote-kicks. (Default: `true`)
+- **PassRatio**: The fraction of voting players required to pass the vote, Not counting the target player (e.g. `0.6` is 60%). (Default: `0.6`)
+- **MinVotes**: The minimum number of total votes needed for a vote to be valid. (Default: `3`)
+- **AutoBanThreshold**: The number of times a player can be vote-kicked before they are automatically and permanently banned from the server. (Default: `3`)
+- **VoteDuration**: Duration of the voting window in seconds. (Default: `45.0`)
+- **ResolutionDisplayTime**: Time in seconds the result of the vote remains on screen. (Default: `20.0`)
+- **NewVoteLockout**: Time in seconds after a vote finishes before any player can start a new vote-kick. (Default: `10.0`)
+- **RequesterCooldown**: Cooldown in seconds before the player who started a vote can initiate another vote-kick. (Default: `300.0`)
+```json
+"VoteKick": {
+    "Enabled": true,
+    "PassRatio": 0.6,
+    "MinVotes": 3,
+    "AutoBanThreshold": 3,
+    "VoteDuration": 45.0,
+    "ResolutionDisplayTime": 20.0,
+    "NewVoteLockout": 10.0,
+    "RequesterCooldown": 300.0
+}
 ```
 
 ### Mission Rotation
