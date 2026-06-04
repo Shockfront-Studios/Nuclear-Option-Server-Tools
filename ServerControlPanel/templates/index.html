@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuclear Option Server Manager</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <style>
         html,
         body {
@@ -231,11 +232,16 @@
                                 <div class="card-body">
                                     <h5 class="card-title">Set Next Mission</h5>
                                     <form id="set-next-mission-form">
-                                        <div class="mb-3">
-                                            <label for="mission-group" class="form-label">Group</label>
-                                            <input type="text" class="form-control" id="mission-group" name="group"
-                                                required>
-                                        </div>
+                                         <div class="mb-3">
+                                             <label for="mission-group" class="form-label">Group</label>
+                                             <select class="form-select" id="mission-group" name="group" required>
+                                                 <option value="BuiltIn">BuiltIn</option>
+                                                 <option value="User">User</option>
+                                                 <option value="Workshop">Workshop</option>
+                                                 <option value="Default">Default</option>
+                                                 <option value="Tutorial">Tutorial</option>
+                                             </select>
+                                         </div>
                                         <div class="mb-3">
                                             <label for="mission-name" class="form-label">Name</label>
                                             <input type="text" class="form-control" id="mission-name" name="name"
@@ -353,6 +359,68 @@
                         </div>
                     </div>
 
+                    <!-- Mission Rotation Group -->
+                    <h3 class="mb-3 mt-4">Mission Rotation</h3>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="card command-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <h5 class="card-title mb-0">Edit Mission Rotation</h5>
+                                         <button class="btn btn-sm btn-outline-secondary" id="btn-get-rotation">Fetch Current Rotation</button>
+                                    </div>
+                                    <div id="rotation-next-override-alert" class="alert alert-warning d-flex justify-content-between align-items-center" style="display: none !important;">
+                                        <span>Next override mission is set: <strong id="lbl-next-override-name"></strong></span>
+                                        <button class="btn btn-sm btn-outline-danger" id="btn-clear-next-override">Clear Next Override</button>
+                                    </div>
+                                    <form id="mission-rotation-form">
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label for="rotation-type-select" class="form-label">Rotation Type</label>
+                                                <select class="form-select" id="rotation-type-select" required>
+                                                    <option value="Sequence">Sequence</option>
+                                                    <option value="PureRandom">PureRandom</option>
+                                                    <option value="RandomQueue">RandomQueue</option>
+                                                </select>
+                                            </div>
+                                            <div class="col-md-6 d-flex align-items-end">
+                                                <div class="form-check mb-2">
+                                                    <input class="form-check-input" type="checkbox" id="chk-clear-next-override-on-save">
+                                                    <label class="form-check-label" for="chk-clear-next-override-on-save">
+                                                        Clear Next Override on Save
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <h6>Missions list</h6>
+                                        <div class="table-responsive mb-3">
+                                            <table class="table table-bordered align-middle" id="tbl-rotation-missions">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Group</th>
+                                                        <th>Name / ID</th>
+                                                        <th>Max Time (seconds)</th>
+                                                        <th style="width: 50px;"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="tbody-rotation-missions">
+                                                    <!-- Dynamic rows go here -->
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        
+                                        <div class="d-flex gap-2">
+                                            <button type="button" class="btn btn-success" id="btn-add-rotation-mission">Add Mission</button>
+                                            <button type="submit" class="btn btn-primary">Save & Apply</button>
+                                            <button type="button" class="btn btn-outline-secondary" id="btn-export-rotation">Export to JSON</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="col-md-4" style="max-height: calc(100vh - 150px); display: flex; flex-direction: column;">
@@ -362,12 +430,17 @@
                             <h5 class="card-title mb-0">Server Connection</h5>
                             <button class="btn btn-sm btn-outline-secondary" onclick="refreshAllServerStatuses()">Refresh All</button>
                         </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="auto-fetch-rotation-check">
+                            <label class="form-check-label" for="auto-fetch-rotation-check" style="font-size: 0.85rem;">Auto-fetch rotation on status check</label>
+                        </div>
                         <div id="server-list">
                             {% for port in allowed_ports %}
                             <div class="server-item" data-port="{{ port }}" onclick="selectServer({{ port }})">
                                 <div class="server-info">
                                     <span class="server-port">Port: {{ port }}</span>
                                     <span class="server-id" id="id-{{ port }}">Steam ID: ...</span>
+                                    <span class="server-rotation" id="rotation-{{ port }}" style="font-size: 0.8rem; color: #198754; display: none;">Rotation: ...</span>
                                 </div>
                                 <span class="status-badge status-checking" id="status-{{ port }}">Checking</span>
                             </div>
@@ -382,6 +455,26 @@
                         <span class="command-timestamp" id="command-timestamp-display"></span>
                     </div>
                     <pre id="response-area">Awaiting command...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exportModalLabel">Export Mission Rotation JSON</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="text-muted">You can copy this JSON block and paste it into your <code>DedicatedServerConfig.json</code> under the <code>RotationType</code> and <code>MissionRotation</code> keys.</p>
+                    <pre id="export-json-content" style="background-color: #f1f1f1; padding: 1rem; border-radius: 4px; max-height: 400px; overflow: auto;"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="btn-copy-export-json">Copy to Clipboard</button>
                 </div>
             </div>
         </div>
@@ -419,7 +512,9 @@
             });
         }
 
-        function selectServer(port) {
+        let currentRotationMissions = [];
+
+        async function selectServer(port) {
             selectedPort = port;
 
             // Update UI
@@ -430,11 +525,168 @@
             if (selectedItem) {
                 selectedItem.classList.add('selected');
             }
+
+            // Only auto-fetch rotation if the auto-fetch setting is enabled
+            const autoFetchRot = document.getElementById('auto-fetch-rotation-check').checked;
+            if (autoFetchRot) {
+                await fetchSelectedServerDetails(port);
+            } else {
+                clearRotationUI();
+            }
+        }
+
+        const activeRotationFetches = {};
+
+        async function getMissionRotationCached(port) {
+            if (activeRotationFetches[port]) {
+                return activeRotationFetches[port];
+            }
+            // Cache the active fetch promise to prevent duplicate concurrent requests
+            const promise = (async () => {
+                try {
+                    const response = await fetch(base_path + '/command/get-mission-rotation', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ server_port: port })
+                    });
+                    return await response.json();
+                } finally {
+                    delete activeRotationFetches[port];
+                }
+            })();
+            activeRotationFetches[port] = promise;
+            return promise;
+        }
+
+        async function fetchSelectedServerDetails(port) {
+            console.log(`[Server Select] Port ${port}: Fetching selected server details`);
+            try {
+                const result = await getMissionRotationCached(port);
+                if (result.status_code === 'Success') {
+                    displayRotation(result.response);
+                } else {
+                    clearRotationUI();
+                }
+            } catch (error) {
+                console.error("Error fetching details on select:", error);
+                clearRotationUI();
+            }
+        }
+
+        function displayRotation(data) {
+            document.getElementById('rotation-type-select').value = data.rotationType;
+            
+            const overrideAlert = document.getElementById('rotation-next-override-alert');
+            if (data.hasNextOverride) {
+                const group = data.nextOverride.Key.Group;
+                const name = data.nextOverride.Key.Name;
+                document.getElementById('lbl-next-override-name').textContent = `${group}/${name}`;
+                overrideAlert.style.setProperty('display', 'flex', 'important');
+            } else {
+                overrideAlert.style.setProperty('display', 'none', 'important');
+            }
+
+            currentRotationMissions = [];
+            if (data.rotation && data.rotation.length > 0) {
+                data.rotation.forEach(opt => {
+                    currentRotationMissions.push({
+                        group: opt.Key.Group,
+                        name: opt.Key.Name,
+                        maxTime: opt.MaxTime
+                    });
+                });
+            }
+            renderRotationTable();
+        }
+
+        function clearRotationUI() {
+            document.getElementById('rotation-next-override-alert').style.setProperty('display', 'none', 'important');
+            currentRotationMissions = [];
+            renderRotationTable();
+        }
+
+        function getGroupOptionsHtml(selectedGroup) {
+            const standardGroups = ["BuiltIn", "User", "Workshop", "Default", "Tutorial"];
+            let options = [];
+            let foundSelected = false;
+            
+            standardGroups.forEach(g => {
+                const isSelected = g === selectedGroup;
+                if (isSelected) {
+                    foundSelected = true;
+                }
+                options.push(`<option value="${g}" ${isSelected ? 'selected' : ''}>${g}</option>`);
+            });
+            
+            // Add custom group option if it is not one of standard groups to avoid losing it
+            if (selectedGroup && !foundSelected) {
+                options.push(`<option value="${escapeHtml(selectedGroup)}" selected>${escapeHtml(selectedGroup)}</option>`);
+            }
+            
+            return options.join('');
+        }
+
+        function renderRotationTable() {
+            const tbody = document.getElementById('tbody-rotation-missions');
+            tbody.innerHTML = '';
+
+            currentRotationMissions.forEach((mission, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <select class="form-select form-select-sm val-group" required>
+                            ${getGroupOptionsHtml(mission.group)}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" class="form-control form-control-sm val-name" value="${escapeHtml(mission.name)}" required>
+                    </td>
+                    <td>
+                        <input type="number" class="form-control form-control-sm val-maxtime" value="${mission.maxTime}" required>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeRotationMission(${index})">&times;</button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        function removeRotationMission(index) {
+            syncMissionsFromTable();
+            currentRotationMissions.splice(index, 1);
+            renderRotationTable();
+        }
+
+        function syncMissionsFromTable() {
+            const tbody = document.getElementById('tbody-rotation-missions');
+            if (!tbody) return;
+            const rows = tbody.querySelectorAll('tr');
+            currentRotationMissions = [];
+            rows.forEach(row => {
+                const group = row.querySelector('.val-group').value;
+                const name = row.querySelector('.val-name').value;
+                const maxTime = parseFloat(row.querySelector('.val-maxtime').value) || 0;
+                currentRotationMissions.push({ group, name, maxTime });
+            });
         }
 
         async function updateServerStatus(port) {
             const statusBadge = document.getElementById(`status-${port}`);
             const idSpan = document.getElementById(`id-${port}`);
+            const rotSpan = document.getElementById(`rotation-${port}`);
+            const autoFetchRot = document.getElementById('auto-fetch-rotation-check').checked;
+            console.log(`[Status Check] Port ${port}: autoFetchRot = ${autoFetchRot}`);
 
             statusBadge.textContent = 'Checking';
             statusBadge.className = 'status-badge status-checking';
@@ -452,6 +704,30 @@
                     statusBadge.textContent = 'Online';
                     statusBadge.className = 'status-badge status-online';
                     idSpan.textContent = `Steam ID: ${result.response.serverId}`;
+
+                    if (autoFetchRot) {
+                        try {
+                            const rotResult = await getMissionRotationCached(port);
+                            if (rotResult.status_code === 'Success') {
+                                const count = rotResult.response.rotation ? rotResult.response.rotation.length : 0;
+                                rotSpan.textContent = `Rotation: ${rotResult.response.rotationType} (${count} mission${count === 1 ? '' : 's'})`;
+                                rotSpan.style.display = 'block';
+                                
+                                // Ensure the main editor UI is updated if status refresh yields a newer version of selected server
+                                if (port === selectedPort) {
+                                    displayRotation(rotResult.response);
+                                }
+                            } else {
+                                rotSpan.textContent = 'Rotation: Error';
+                                rotSpan.style.display = 'block';
+                            }
+                        } catch (rotErr) {
+                            rotSpan.textContent = 'Rotation: Error';
+                            rotSpan.style.display = 'block';
+                        }
+                    } else {
+                        rotSpan.style.display = 'none';
+                    }
                 } else {
                     throw new Error('Offline');
                 }
@@ -459,6 +735,7 @@
                 statusBadge.textContent = 'Offline';
                 statusBadge.className = 'status-badge status-offline';
                 idSpan.textContent = 'Steam ID: N/A';
+                rotSpan.style.display = 'none';
             }
         }
 
@@ -604,6 +881,109 @@
                 const command = this.getAttribute('data-command');
                 sendCommand(`/command/${command}`, {});
             });
+        });
+
+        // Setup settings checkbox
+        const autoFetchCheck = document.getElementById('auto-fetch-rotation-check');
+        const storedVal = localStorage.getItem('autoFetchRotationStatus');
+        if (storedVal !== null) {
+            autoFetchCheck.checked = storedVal === 'true';
+        } else {
+            autoFetchCheck.checked = false;
+        }
+        console.log("Checkbox autoFetchCheck initialized to:", autoFetchCheck.checked);
+
+        autoFetchCheck.addEventListener('change', function() {
+            localStorage.setItem('autoFetchRotationStatus', this.checked);
+            refreshAllServerStatuses();
+        });
+
+        document.getElementById('btn-get-rotation').addEventListener('click', function(e) {
+            e.preventDefault();
+            if (selectedPort !== null) {
+                fetchSelectedServerDetails(selectedPort);
+            }
+        });
+
+        document.getElementById('btn-add-rotation-mission').addEventListener('click', function() {
+            syncMissionsFromTable();
+            currentRotationMissions.push({ group: 'BuiltIn', name: '', maxTime: 7200 });
+            renderRotationTable();
+        });
+
+        document.getElementById('btn-clear-next-override').addEventListener('click', async function() {
+            if (selectedPort === null) return;
+            if (confirm('Are you sure you want to clear the next mission override?')) {
+                await sendCommand('/command/clear-next-mission', {});
+                setTimeout(() => fetchSelectedServerDetails(selectedPort), 1000);
+            }
+        });
+
+        document.getElementById('btn-export-rotation').addEventListener('click', function() {
+            syncMissionsFromTable();
+            const rotationType = document.getElementById('rotation-type-select').value;
+            
+            const exportData = {
+                RotationType: rotationType,
+                MissionRotation: currentRotationMissions.map(m => ({
+                    Key: {
+                        Group: m.group,
+                        Name: m.name
+                    },
+                    MaxTime: m.maxTime
+                }))
+            };
+
+            const jsonStr = JSON.stringify(exportData, null, 2);
+            document.getElementById('export-json-content').textContent = jsonStr;
+
+            const myModal = new bootstrap.Modal(document.getElementById('exportModal'));
+            myModal.show();
+        });
+
+        document.getElementById('btn-copy-export-json').addEventListener('click', function() {
+            const content = document.getElementById('export-json-content').textContent;
+            navigator.clipboard.writeText(content).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                alert('Failed to copy text: ' + err);
+            });
+        });
+
+        document.getElementById('mission-rotation-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            syncMissionsFromTable();
+            
+            if (currentRotationMissions.length === 0) {
+                alert('You must add at least one mission to the rotation.');
+                return;
+            }
+
+            const rotationType = document.getElementById('rotation-type-select').value;
+            const clearNextOverride = document.getElementById('chk-clear-next-override-on-save').checked;
+
+            const payload = {
+                rotation_data: {
+                    rotationType: rotationType,
+                    clearNextOverride: clearNextOverride,
+                    rotation: currentRotationMissions.map(m => ({
+                        Key: {
+                            Group: m.group,
+                            Name: m.name
+                        },
+                        MaxTime: m.maxTime
+                    }))
+                }
+            };
+
+            await sendCommand('/command/set-mission-rotation', payload);
+            
+            if (selectedPort !== null) {
+                setTimeout(() => {
+                    fetchSelectedServerDetails(selectedPort);
+                    refreshAllServerStatuses();
+                }, 1000);
+            }
         });
 
         // Initial setup

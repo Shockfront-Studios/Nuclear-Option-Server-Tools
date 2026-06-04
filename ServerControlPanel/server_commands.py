@@ -2,6 +2,7 @@
 This module provides functions to interact with the game server's remote commands.
 """
 
+import json
 from typing import Optional
 
 from remote_commander import RemoteCommander
@@ -89,3 +90,19 @@ def get_player_list(commander: RemoteCommander):
 def get_server_id(commander: RemoteCommander):
     """Retrieves the Steam ID of the server."""
     return commander.send_command("get-server-id")
+
+
+def get_mission_rotation(commander: RemoteCommander):
+    """Retrieves the current mission rotation configuration."""
+    return commander.send_command("get-mission-rotation")
+
+
+def set_mission_rotation(commander: RemoteCommander, rotation_data: dict):
+    """Sets the mission rotation configuration."""
+    rotation_json = json.dumps(rotation_data)
+    return commander.send_command("set-mission-rotation", [rotation_json])
+
+
+def clear_next_mission(commander: RemoteCommander):
+    """Clears the next overridden mission."""
+    return commander.send_command("clear-next-mission")

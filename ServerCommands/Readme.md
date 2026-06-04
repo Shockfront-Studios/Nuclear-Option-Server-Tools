@@ -316,3 +316,92 @@ Clears the ban list loaded in the Authenticator. **NOTE:** This command does **n
     "arguments": []
 }
 ```
+
+### `get-mission-rotation`
+
+Retrieves the current mission rotation configuration, type, and next override status.
+
+```json
+{
+    "name": "get-mission-rotation",
+    "arguments": []
+}
+```
+
+#### Response
+
+```json
+{
+    "rotationType": "Sequence",
+    "rotation": [
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Escalation"
+            },
+            "MaxTime": 7200.0
+        },
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Terminal Control"
+            },
+            "MaxTime": 7200.0
+        }
+    ],
+    "hasNextOverride": true,
+    "nextOverride": {
+        "Key": {
+            "Group": "BuiltIn",
+            "Name": "Escalation"
+        },
+        "MaxTime": 3600.0
+    }
+}
+```
+
+### `set-mission-rotation`
+
+Sets the mission rotation configuration in memory and reloads the configuration.
+
+Since `arguments` is an array of strings, the rotation configuration object must be serialized/encoded into a JSON string and passed as the first element (`arguments[0]`).
+
+**Example payload:**
+
+```json
+{
+    "name": "set-mission-rotation",
+    "arguments": [
+        "{\"rotationType\":\"Sequence\",\"clearNextOverride\":false,\"rotation\":[{\"Key\":{\"Group\":\"BuiltIn\",\"Name\":\"Escalation\"},\"MaxTime\":7200.0}]}"
+    ]
+}
+```
+
+The string in `arguments[0]` is deserialized from the following JSON structure:
+
+```json
+{
+    "rotationType": "Sequence",
+    "clearNextOverride": false,
+    "rotation": [
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Escalation"
+            },
+            "MaxTime": 7200.0
+        }
+    ]
+}
+```
+
+### `clear-next-mission`
+
+Clears the next overridden mission, reverting back to the standard rotation.
+
+```json
+{
+    "name": "clear-next-mission",
+    "arguments": []
+}
+```

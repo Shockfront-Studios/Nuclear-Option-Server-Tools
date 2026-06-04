@@ -167,6 +167,49 @@ def get_server_id():
     return jsonify({'status_code': status_code, 'response': response})
 
 
+@app.route('/command/get-mission-rotation', methods=['POST'])
+@requires_auth
+def get_mission_rotation():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.get_mission_rotation(commander)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
+@app.route('/command/set-mission-rotation', methods=['POST'])
+@requires_auth
+def set_mission_rotation():
+    data = request.get_json()
+    rotation_data = data.get('rotation_data')
+    if not rotation_data:
+        return jsonify({'success': False, 'error': 'Rotation data not provided'}), 400
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.set_mission_rotation(
+        commander, rotation_data)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
+@app.route('/command/clear-next-mission', methods=['POST'])
+@requires_auth
+def clear_next_mission():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.clear_next_mission(commander)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
 @app.route('/command/set-time-remaining', methods=['POST'])
 @requires_auth
 def set_time_remaining():
