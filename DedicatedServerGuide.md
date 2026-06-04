@@ -246,37 +246,48 @@ Mission group options:
 - `Tutorial` *loads from game files*
 - `BuiltIn` *loads from game files*
 - `User` *loads from `MissionDirectory` folder*
-- ~~`Workshop`~~ *not implemented* (use `User` instead)
+- `Workshop` *loads from Steam Workshop automatically using the Workshop item ID*
 
-when using `MissionDirectory`, mission will be loaded at path `<MissionDirectory>/<name>/<name>.json`.
+when using `MissionDirectory` (User group), mission will be loaded at path `<MissionDirectory>/<name>/<name>.json`.
 
 For example if `MissionDirectory` is `/home/steam/NuclearOption-Missions` and mission name is `test1` then the path will be `/home/steam/NuclearOption-Missions/test1/test1.json`
 
 **note:** MissionDirectory should be a full path
 
-**Important:** The mission folder name must exactly match the mission JSON file's base name.  
+**Important:** For the User group, the mission folder name must exactly match the mission JSON file's base name.  
 For example, for a mission named `test1`, the folder must be `.../test1/` and the file must be `.../test1/test1.json`. If these names do not match, the mission will not load.
 
 #### Workshop missions
-- Download workshop items using steamcmd. Anonymous login is supported for accessing Workshop content.
-- After download, copy the mission folder to `<MissionDirectory>` and **ensure the folder name matches the mission JSON file** name as noted above.
-- Use `User` group in `DedicatedServerConfig.json`.
 
-Download command (Anonymous):
-```sh
-steamcmd +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit
+The server natively supports downloading and updating public and unlisted Workshop missions automatically. 
+
+To use a Workshop mission in your rotation:
+1. In `DedicatedServerConfig.json`, set the mission's `Group` to `"Workshop"`.
+2. Set the `Name` to the Workshop published file ID (e.g., `"3104381984"`).
+
+Example configuration:
+```json
+"MissionRotation": [
+    {
+        "Key": {
+            "Group": "Workshop",
+            "Name": "3104381984"
+        },
+        "MaxTime": 7200.0
+    }
+]
 ```
-Or specifying a download directory:
-```sh
-steamcmd +force_install_dir <install_dir> +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit
-```
 
-Workshop files are always placed inside a Steam directory structure: `<install_dir>/steamapps/workshop/content/2168680/<WorkshopID>/`. 
-For example, if you use `+force_install_dir /home/steam/nuclear-option/Missions`, the files will be downloaded to `/home/steam/nuclear-option/Missions/steamapps/workshop/content/2168680/<WorkshopID>/`.
+When the server starts or reloads its config, it will automatically download all specified Workshop missions to the `<Server-Executable-Directory>/steamapps/workshop/content/2168680/` folder. It will also query and download updates dynamically in the background.
 
-The downloaded folder will be named after the `<WorkshopID>` (e.g., `3669299832`). You **must rename this folder** to exactly match the base name of the mission's `.json` file inside it when moving it to your `<MissionDirectory>`.
-
-For example, if the workshop folder contains `MyCustomMission.json`, you must rename the folder from `3669299832` to `MyCustomMission`, resulting in the path: `<MissionDirectory>/MyCustomMission/MyCustomMission.json`.
+If you need to manually download or host a mission (e.g., private/unlisted files that require specific credentials), you can still use the legacy manual method:
+1. Download the workshop items using `steamcmd`:
+   ```sh
+   steamcmd +login anonymous +workshop_download_item 2168680 <WorkshopID> +quit
+   ```
+2. Move the downloaded folder to your `<MissionDirectory>`.
+3. **Rename the folder** from the Workshop ID (e.g., `3669299832`) to exactly match the base name of the mission's `.json` file inside it (e.g., `MyCustomMission`).
+4. Reference it under the `User` group in your configuration.
 
 
 ## Troubleshooting
