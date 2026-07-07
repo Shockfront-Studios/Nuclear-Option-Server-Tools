@@ -14,3 +14,8 @@ USERNAME = "admin"
 PASSWORD = "changeme"  # PLEASE CHANGE THIS!
 SSL_CERT_PATH = ""  # Path to your SSL certificate file (e.g., /path/to/cert.pem)
 SSL_KEY_PATH = ""   # Path to your SSL private key file (e.g., /path/to/key.pem)
+
+# Steam Web API Configuration (Optional)
+# Get a key from https://steamcommunity.com/dev/apikey to resolve player SteamIDs to names
+STEAM_API_KEY = ""
+

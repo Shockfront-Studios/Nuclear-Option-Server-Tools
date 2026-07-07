@@ -3,6 +3,10 @@ Main Flask application for the Nuclear Option Server Manager.
 """
 
 from functools import wraps
+import json
+import urllib.error
+import urllib.parse
+import urllib.request
 from flask import Flask, jsonify, request, Response, render_template
 
 import config
@@ -141,6 +145,52 @@ def get_mission():
     return jsonify({'status_code': status_code, 'response': response})
 
 
+def resolve_steam_names(steam_ids):
+    """Resolves a list of SteamID strings to their display names via the Steam Web API.
+    
+    Returns:
+        tuple: (name_map, warning) where name_map maps steam_id to personaname.
+    """
+    # Check if API key is configured
+    api_key = getattr(config, 'STEAM_API_KEY', None)
+    if not api_key:
+        return {}, "Steam API key is not configured. Player names cannot be resolved. Please set STEAM_API_KEY in config.py."
+
+    # Clean up and get unique non-empty steam IDs
+    steam_ids_clean = list(set([str(sid) for sid in steam_ids if sid]))
+    if not steam_ids_clean:
+        return {}, None
+
+    url = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/"
+    params = {
+        'key': api_key,
+        'steamids': ','.join(steam_ids_clean)
+    }
+    
+    query_string = urllib.parse.urlencode(params)
+    full_url = f"{url}?{query_string}"
+
+    try:
+        req = urllib.request.Request(
+            full_url, 
+            headers={'User-Agent': 'Nuclear-Option-Server-Panel/1.0'}
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            if response.status == 200:
+                data = json.loads(response.read().decode('utf-8'))
+                players = data.get('response', {}).get('players', [])
+                name_map = {player['steamid']: player['personaname'] for player in players if 'steamid' in player and 'personaname' in player}
+                return name_map, None
+            else:
+                return {}, f"Steam API returned status code {response.status}."
+    except urllib.error.URLError as e:
+        print(f"Error fetching Steam summaries: {e}")
+        return {}, f"Network error contacting Steam API: {e.reason}"
+    except Exception as e:
+        print(f"Unexpected error resolving Steam names: {e}")
+        return {}, f"Unexpected error resolving Steam names: {str(e)}"
+
+
 @app.route('/command/get-player-list', methods=['POST'])
 @requires_auth
 def get_player_list():
@@ -151,6 +201,24 @@ def get_player_list():
         return error
 
     status_code, response = server_commands.get_player_list(commander)
+    
+    # Resolve SteamIDs to names and handle the API response mapping
+    if status_code == 'Success' and isinstance(response, dict):
+        players = response.get("Players", [])
+        steam_ids = [p.get("steamId") for p in players if p.get("steamId")]
+        
+        name_map, warning = resolve_steam_names(steam_ids)
+        
+        for player in players:
+            sid = player.get("steamId")
+            if sid:
+                player["displayName"] = name_map.get(sid, sid)
+            else:
+                player["displayName"] = "Unknown"
+        
+        if warning:
+            response["warning"] = warning
+
     return jsonify({'status_code': status_code, 'response': response})
 
 

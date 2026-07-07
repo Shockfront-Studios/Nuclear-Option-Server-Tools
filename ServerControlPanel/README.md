@@ -41,6 +41,8 @@ Key settings to change:
 -   **`FLASK_HOST`**: The IP address that the Flask web panel binds to. Set this to `127.0.0.1` to only accept connections from localhost (recommended if using a reverse proxy like Nginx on the same machine), or `0.0.0.0` to listen on all interfaces and allow direct external connections.
 -   **`FLASK_PORT`**: The port that the web panel will run on.
 -   **`SSL_CERT_PATH` and `SSL_KEY_PATH`**: Optional paths to your SSL certificate and private key files. If both paths are provided, the server will run with HTTPS. If they are left empty, the server will run with standard HTTP (suitable for running behind a reverse proxy).
+-   **`STEAM_API_KEY`**: *(Optional)* Steam Web API Key. Since the dedicated game server runs headlessly and does not cache or send player names (only SteamIDs), the web panel uses this key to resolve SteamIDs to human-readable names. If this key is not set, players will be listed by their SteamID, and a warning will be shown in the API response. You can obtain a key at [steamcommunity.com/dev/apikey](https://steamcommunity.com/dev/apikey).
+
 
 ### Deployment with a Reverse Proxy (Nginx)
 

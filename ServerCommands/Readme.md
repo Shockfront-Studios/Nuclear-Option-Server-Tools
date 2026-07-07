@@ -180,18 +180,19 @@ Retrieves the current connected player list from the server.
 ```
 
 #### Response
+The dedicated server returns only the `steamId` and `faction` fields (the `displayName` field has been removed since the server runs headlessly and does not cache names).
+
+The external server can fetch steam name using Steam's Web API.
 
 ```json
 {
     "Players": [
         {
             "steamId": "0123456789",
-            "displayName": "PlayerOne",
             "faction": "Boscali"
         },
         {
             "steamId": "9876543210",
-            "displayName": "PlayerTwo",
             "faction": "Primeva"
         }
     ]
