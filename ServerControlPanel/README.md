@@ -37,8 +37,9 @@ All configuration is handled in the `config.py` file. Before running the applica
 Key settings to change:
 
 -   **`USERNAME` and `PASSWORD`**: This is for the web panel's Basic Authentication. **It is critical that you change the default password** to secure your server.
--   **`SERVER_HOST` and `SERVER_PORT`**: The IP address and remote command port for your Nuclear Option game server.
--   **`FLASK_HOST` and `FLASK_PORT`**: The IP address and port the web panel will run on.
+-   **`SERVER_PORTS`**: A list of remote command ports for your Nuclear Option game servers. *Note: the game server only listens on 127.0.0.1 (localhost), but you can run multiple on the same machine.*
+-   **`FLASK_HOST`**: The IP address that the Flask web panel binds to. Set this to `127.0.0.1` to only accept connections from localhost (recommended if using a reverse proxy like Nginx on the same machine), or `0.0.0.0` to listen on all interfaces and allow direct external connections.
+-   **`FLASK_PORT`**: The port that the web panel will run on.
 -   **`SSL_CERT_PATH` and `SSL_KEY_PATH`**: Optional paths to your SSL certificate and private key files. If both paths are provided, the server will run with HTTPS. If they are left empty, the server will run with standard HTTP (suitable for running behind a reverse proxy).
 
 ### Deployment with a Reverse Proxy (Nginx)
