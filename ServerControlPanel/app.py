@@ -252,6 +252,8 @@ def get_player_list():
         for player in players:
             # older game servers don't send playerIndex, 0 means not assigned
             player.setdefault("playerIndex", 0)
+            # older game servers don't send serverTag, empty means no tag
+            player.setdefault("serverTag", "")
 
             sid = player.get("steamId")
             if sid:

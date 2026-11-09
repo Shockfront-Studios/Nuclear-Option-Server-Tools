@@ -180,7 +180,7 @@ Retrieves the current connected player list from the server.
 ```
 
 #### Response
-The dedicated server returns only the `steamId`, `faction` and `playerIndex` fields (the `displayName` field has been removed since the server runs headlessly and does not cache names).
+The dedicated server returns only the `steamId`, `faction`, `playerIndex` and `serverTag` fields (the `displayName` field has been removed since the server runs headlessly and does not cache names).
 
 The external server can fetch steam name using Steam's Web API.
 
@@ -192,12 +192,14 @@ Players who are still loading into the map are included.
         {
             "steamId": "0123456789",
             "faction": "Boscali",
-            "playerIndex": 1
+            "playerIndex": 1,
+            "serverTag": "ADMIN"
         },
         {
             "steamId": "9876543210",
             "faction": "Primeva",
-            "playerIndex": 2
+            "playerIndex": 2,
+            "serverTag": ""
         }
     ]
 }
@@ -210,6 +212,10 @@ Players who are still loading into the map are included.
 - Older game servers don't send this field, treat it as optional (default `0`)
 
 **NOTE:** Do not store `playerIndex` as a player's identity, always store `steamId`. To target a player by `playerIndex` (eg kick/ban), call `get-player-list` first to find their `steamId`, then use the `steamId` based command.
+
+`serverTag` is the tag shown next to the player's name in game:
+- Empty if the player has no tag set, or is still loading
+- Older game servers don't send this field, treat it as optional (default `""`)
 
 ### `set-time-remaining`
 
