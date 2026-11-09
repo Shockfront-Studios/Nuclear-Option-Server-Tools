@@ -71,10 +71,50 @@ def get_commander_from_data(data):
     """
     port = data.get('server_port', None)
     if not validate_port(port):
-        return None, jsonify({'success': False, 'error': f'Port {port} not allowed'}), 400
+        return None, (jsonify({'success': False, 'error': f'Port {port} not allowed'}), 400)
 
     commander = create_remote_commander(port)
     return commander, None
+
+
+def get_target_steam_id(commander, data):
+    """Gets the target SteamID from data, either directly or by looking up the in-game Player Index (playerIndex).
+
+    Player Index is only used for the lookup and never stored, because it changes between missions.
+
+    Returns:
+        tuple: (steam_id, error_response) where error_response is None if successful
+    """
+    steam_id = data.get('steam_id')
+    player_index = data.get('player_index')
+    if steam_id and player_index:
+        return None, (jsonify({'success': False, 'error': 'Provide either Steam ID or Player Index, not both'}), 400)
+    if steam_id:
+        return steam_id, None
+    if not player_index:
+        return None, (jsonify({'success': False, 'error': 'Steam ID or Player Index not provided'}), 400)
+
+    try:
+        player_index_int = int(player_index)
+    except (ValueError, TypeError):
+        return None, (jsonify({'success': False, 'error': 'Invalid Player Index'}), 400)
+
+    # playerIndex is 1-based, 0 means not assigned so can't be used to find a player
+    if player_index_int < 1:
+        return None, (jsonify({'success': False, 'error': 'Invalid Player Index'}), 400)
+
+    # Always fetch a fresh list because playerIndex is renumbered when the mission changes
+    status_code, response = server_commands.get_player_list(commander)
+    if status_code != 'Success' or not isinstance(response, dict):
+        # 502 because the game server failed, not the user's input
+        return None, (jsonify({'success': False, 'error': f'get-player-list failed: {status_code}'}), 502)
+
+    steam_id, lookup_error = server_commands.find_steam_id_by_player_index(
+        response.get("Players", []), player_index_int)
+    if lookup_error:
+        return None, (jsonify({'success': False, 'error': lookup_error}), 400)
+
+    return steam_id, None
 
 
 @app.route('/command/update-ready', methods=['POST'])
@@ -210,6 +250,9 @@ def get_player_list():
         name_map, warning = resolve_steam_names(steam_ids)
         
         for player in players:
+            # older game servers don't send playerIndex, 0 means not assigned
+            player.setdefault("playerIndex", 0)
+
             sid = player.get("steamId")
             if sid:
                 player["displayName"] = name_map.get(sid, sid)
@@ -326,11 +369,12 @@ def set_next_mission():
 @requires_auth
 def kick_player():
     data = request.get_json()
-    steam_id = data.get('steam_id')
-    if not steam_id:
-        return jsonify({'success': False, 'error': 'Steam ID not provided'}), 400
 
     commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    steam_id, error = get_target_steam_id(commander, data)
     if error:
         return error
 
@@ -384,12 +428,13 @@ def banlist_reload():
 @requires_auth
 def banlist_add():
     data = request.get_json()
-    steam_id = data.get('steam_id')
     reason = data.get('reason')
-    if not steam_id:
-        return jsonify({'success': False, 'error': 'Steam ID not provided'}), 400
 
     commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    steam_id, error = get_target_steam_id(commander, data)
     if error:
         return error
 

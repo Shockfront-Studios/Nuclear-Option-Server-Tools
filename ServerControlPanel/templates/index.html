@@ -300,8 +300,11 @@
                                     <form id="kick-player-form">
                                         <div class="mb-3">
                                             <label for="kick-steam-id" class="form-label">Steam ID</label>
-                                            <input type="text" class="form-control" id="kick-steam-id" name="steam_id"
-                                                required>
+                                            <input type="text" class="form-control" id="kick-steam-id" name="steam_id">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="kick-player-index" class="form-label">or Player Index (in-game number, changes each mission)</label>
+                                            <input type="number" min="1" class="form-control" id="kick-player-index" name="player_index">
                                         </div>
                                         <button type="submit" class="btn btn-danger">Kick</button>
                                     </form>
@@ -330,8 +333,11 @@
                                     <form id="ban-player-form">
                                         <div class="mb-3">
                                             <label for="ban-steam-id" class="form-label">Steam ID</label>
-                                            <input type="text" class="form-control" id="ban-steam-id" name="steam_id"
-                                                required>
+                                            <input type="text" class="form-control" id="ban-steam-id" name="steam_id">
+                                        </div>
+                                        <div class="mb-3">
+                                            <label for="ban-player-index" class="form-label">or Player Index (in-game number, changes each mission)</label>
+                                            <input type="number" min="1" class="form-control" id="ban-player-index" name="player_index">
                                         </div>
                                         <div class="mb-3">
                                             <label for="ban-reason" class="form-label">Reason (optional)</label>
@@ -851,7 +857,8 @@
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
-            sendCommand('/command/kick-player', { steam_id });
+            const player_index = formData.get('player_index');
+            sendCommand('/command/kick-player', { steam_id, player_index });
         });
 
         document.getElementById('unkick-player-form').addEventListener('submit', function (e) {
@@ -865,8 +872,9 @@
             e.preventDefault();
             const formData = new FormData(this);
             const steam_id = formData.get('steam_id');
+            const player_index = formData.get('player_index');
             const reason = formData.get('reason');
-            sendCommand('/command/banlist-add', { steam_id, reason });
+            sendCommand('/command/banlist-add', { steam_id, player_index, reason });
         });
 
         document.getElementById('unban-player-form').addEventListener('submit', function (e) {

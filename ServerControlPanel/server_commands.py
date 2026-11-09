@@ -87,6 +87,27 @@ def get_player_list(commander: RemoteCommander):
     return commander.send_command("get-player-list")
 
 
+def find_steam_id_by_player_index(players: list, player_index: int):
+    """Looks up the SteamID of the player with the given in-game Player Index (playerIndex).
+
+    Args:
+        players: the "Players" list from a fresh get-player-list response.
+
+    Returns:
+        tuple: (steam_id, error) where error is None if a player was found.
+    """
+    for player in players:
+        # older game servers don't send playerIndex, so default to 0 (not assigned)
+        if player.get("playerIndex", 0) == player_index:
+            return player.get("steamId"), None
+
+    # if nobody has an index, the user's input isn't the problem, the server is too old to send it
+    if players and all("playerIndex" not in player for player in players):
+        return None, "Game server did not send playerIndex, it may be an older version. Use Steam ID instead"
+
+    return None, f"No player found with Player Index {player_index}"
+
+
 def get_server_id(commander: RemoteCommander):
     """Retrieves the Steam ID of the server."""
     return commander.send_command("get-server-id")
