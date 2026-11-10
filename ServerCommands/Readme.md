@@ -353,6 +353,25 @@ Older game servers don't have this command and will reply with `UnknownCommand`.
 }
 ```
 
+### `stafflist-reload`
+
+Reloads the staff list from the files in `StaffListPaths` in server config, and updates players in the match whose permission level or tag changed. See `DedicatedServerGuide.md` for the staff list file format.
+
+**NOTE:** Unlike `banlist-reload`, this is a full sync with the files. Players removed from the files go back to `Player` level with no tag, so there is no clear command.
+
+**NOTE:** Assumes no mods are setting permission levels or tags. A player removed from the files has their level and tag reset, even if a mod set them.
+
+`reload-config` also reloads the staff list in the same way.
+
+Older game servers don't have this command and will reply with `UnknownCommand`.
+
+```json
+{
+    "name": "stafflist-reload",
+    "arguments": []
+}
+```
+
 ### `get-mission-rotation`
 
 Retrieves the current mission rotation configuration, type, and next override status.

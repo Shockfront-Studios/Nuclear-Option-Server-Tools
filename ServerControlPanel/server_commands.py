@@ -87,6 +87,11 @@ def immunelist_clear(commander: RemoteCommander):
     return commander.send_command("immunelist-clear")
 
 
+def stafflist_reload(commander: RemoteCommander):
+    """Reloads the staff list files and updates players in the match. Players removed from the files lose their permission level and tag."""
+    return commander.send_command("stafflist-reload")
+
+
 def get_player_list(commander: RemoteCommander):
     """Retrieves the current connected player list from the server."""
     return commander.send_command("get-player-list")

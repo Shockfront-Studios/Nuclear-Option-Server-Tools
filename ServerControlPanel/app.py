@@ -488,6 +488,19 @@ def immunelist_clear():
     return jsonify({'status_code': status_code, 'response': response})
 
 
+@app.route('/command/stafflist-reload', methods=['POST'])
+@requires_auth
+def stafflist_reload():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.stafflist_reload(commander)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
 if __name__ == '__main__':
     ssl_context = None
     if config.SSL_CERT_PATH and config.SSL_KEY_PATH:
