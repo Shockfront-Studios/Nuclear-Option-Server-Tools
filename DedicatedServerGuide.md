@@ -37,6 +37,7 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
 
 - **Configure** `DedicatedServerConfig.json`
   - After first running the server DedicatedServerConfig.json will be created with default values, you can then edit this to change the server settings
+  - See [ExampleConfig](ExampleConfig/) for a filled in example config, and example ban list, immune list and staff list files
 
 
 ### Default Config
@@ -61,6 +62,7 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
     ],
     "DisableErrorKick": false,
     "ErrorKickImmuneListPaths": [],
+    "StaffListPaths": [],
     "NoPlayerStopTime": 30.0,
     "PostMissionDelay": 30.0,
     "RotationType": 0,
@@ -137,6 +139,8 @@ The server uses an override system for ports. `IsOverride` must be set to `true`
 
 **BanListPaths**
 A list of file paths (relative to the server executable or absolute) that contain lists of SteamIDs to block from joining.
+- One SteamID per line, with an optional reason after `//`, eg `00000000000000001 // cheating`. See [ban_list.txt](ExampleConfig/ban_list.txt).
+- The `banlist-reload` remote command only adds new ids. To remove ids, use `banlist-clear` then `banlist-reload`. See [ServerCommands](ServerCommands/Readme.md).
 ```json
 "BanListPaths": [
     "ban_list.txt",
@@ -152,10 +156,43 @@ By default, the server kicks players who cause errors to prevent instability. Se
 
 **ErrorKickImmuneListPaths**
 A list of file paths containing SteamIDs of players who should never be kicked for errors, even if `DisableErrorKick` is `false`.
+- Same file format as `BanListPaths`.
+- `banlist-reload` also reloads these files, only adding new ids. To remove ids, use `immunelist-clear` then `banlist-reload`.
 ```json
 "ErrorKickImmuneListPaths": [
     "admins.txt"
 ]
+```
+
+**StaffListPaths**
+A list of JSON file paths that give players a permission level and a tag, without needing a mod. Empty by default.
+- **Permission level** controls which chat commands a player can use. Use `"Player"`, `"Moderator"`, `"Admin"`, or a number from `0` to `254` for a custom level between them (eg `75`). `Host` can't be given out.
+- **Tag** is shown before the player's name in chat and on the leaderboard, for every player. Rich text is allowed, eg `<color=red>Admin</color>`. Leave it out for no tag.
+- **SteamIDs** are strings, so tools that read the file don't lose precision on 17 digit numbers.
+- **Same player in more than one entry or file:** the highest permission level wins, and the tag comes with it. On equal levels, the first one found is used.
+- **Reloading:** the `stafflist-reload` remote command (and `reload-config`) reload the files and update players in the match. Unlike the ban list, players removed from the files lose their permission level and tag, so no clear command is needed.
+- **Mods** can still set permission levels and tags. The staff list is applied when a player joins, before mods see the player, so mods can override it. `stafflist-reload` assumes no mods are setting these values.
+```json
+"StaffListPaths": [
+    "staff_list.json"
+]
+```
+Example staff file (see [staff_list.json](ExampleConfig/staff_list.json)):
+```json
+{
+    "Staff": [
+        {
+            "steamId": "00000000000000005",
+            "permissionLevel": "Admin",
+            "tag": "<color=red>Admin</color>"
+        },
+        {
+            "steamId": "00000000000000007",
+            "permissionLevel": 75,
+            "tag": "Senior Mod"
+        }
+    ]
+}
 ```
 
 **NoPlayerStopTime**
