@@ -295,9 +295,9 @@ when using `MissionDirectory` (User group), mission will be loaded at path `<Mis
 
 For example if `MissionDirectory` is `/home/steam/NuclearOption-Missions` and mission name is `test1` then the path will be `/home/steam/NuclearOption-Missions/test1/test1.json`
 
-**note:** MissionDirectory should be a full path
+**NOTE:** MissionDirectory should be a full path
 
-**Important:** For the User group, the mission folder name must exactly match the mission JSON file's base name.  
+**IMPORTANT:** For the User group, the mission folder name must exactly match the mission JSON file's base name.  
 For example, for a mission named `test1`, the folder must be `.../test1/` and the file must be `.../test1/test1.json`. If these names do not match, the mission will not load.
 
 #### Workshop missions
