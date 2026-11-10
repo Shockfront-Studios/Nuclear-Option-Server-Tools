@@ -171,7 +171,7 @@ A list of JSON file paths that give players a permission level and a tag, withou
 - **SteamIDs** are strings, so tools that read the file don't lose precision on 17 digit numbers.
 - **Same player in more than one entry or file:** the highest permission level wins, and the tag comes with it. On equal levels, the first one found is used.
 - **Reloading:** the `stafflist-reload` remote command (and `reload-config`) reload the files and update players in the match. Unlike the ban list, players removed from the files lose their permission level and tag, so no clear command is needed.
-- **Mods** can still set permission levels and tags. The staff list is applied when a player joins, before mods see the player, so mods can override it. `stafflist-reload` assumes no mods are setting these values.
+- **Mods** can still set permission levels and tags. The staff list is applied before the `NuclearOption.ModdingApi.PlayerHandle.PlayerJoined` event is called, so mods can override the list and set their own values in (or after) that event is called. the `stafflist-reload` command will set the permission and tag again causing any values from mods to be overwritten.
 ```json
 "StaffListPaths": [
     "staff_list.json"
