@@ -1,0 +1,24 @@
+{
+    "Staff": [
+        {
+            "steamId": "00000000000000005",
+            "permissionLevel": "Admin",
+            "tag": "<color=red>Admin</color>"
+        },
+        {
+            "steamId": "00000000000000006",
+            "permissionLevel": "Moderator",
+            "tag": "<color=#4da6ff>Mod</color>"
+        },
+        {
+            "steamId": "00000000000000007",
+            "permissionLevel": 75,
+            "tag": "Senior Mod"
+        },
+        {
+            "steamId": "00000000000000008",
+            "permissionLevel": "Player",
+            "tag": "Squad Lead"
+        }
+    ]
+}

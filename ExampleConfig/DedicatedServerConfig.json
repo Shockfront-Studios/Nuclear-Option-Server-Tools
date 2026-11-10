@@ -1,0 +1,62 @@
+{
+    "MissionDirectory": "/home/steam/NuclearOption-Missions",
+    "ModdedServer": false,
+    "Hidden": false,
+    "ServerName": "My Nuclear Option Server",
+    "Port": {
+        "IsOverride": true,
+        "Value": 7777
+    },
+    "QueryPort": {
+        "IsOverride": true,
+        "Value": 7778
+    },
+    "Password": "secret password",
+    "MaxPlayers": 32,
+    "BanListPaths": [
+        "ban_list.txt"
+    ],
+    "DisableErrorKick": false,
+    "ErrorKickImmuneListPaths": [
+        "error_kick_immune_list.txt"
+    ],
+    "StaffListPaths": [
+        "staff_list.json"
+    ],
+    "NoPlayerStopTime": 60.0,
+    "PostMissionDelay": 30.0,
+    "RotationType": 2,
+    "MissionRotation": [
+        {
+            "Key": {
+                "Group": "BuiltIn",
+                "Name": "Escalation"
+            },
+            "MaxTime": 7200.0
+        },
+        {
+            "Key": {
+                "Group": "User",
+                "Name": "My Custom Mission"
+            },
+            "MaxTime": 3600.0
+        },
+        {
+            "Key": {
+                "Group": "Workshop",
+                "Name": "1234567890"
+            },
+            "MaxTime": 5400.0
+        }
+    ],
+    "VoteKick": {
+        "Enabled": true,
+        "PassRatio": 0.6,
+        "MinVotes": 3,
+        "AutoBanThreshold": 3,
+        "VoteDuration": 45.0,
+        "ResolutionDisplayTime": 20.0,
+        "NewVoteLockout": 10.0,
+        "RequesterCooldown": 300.0
+    }
+}
