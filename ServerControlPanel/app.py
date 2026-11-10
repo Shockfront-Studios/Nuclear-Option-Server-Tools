@@ -475,6 +475,19 @@ def banlist_clear():
     return jsonify({'status_code': status_code, 'response': response})
 
 
+@app.route('/command/immunelist-clear', methods=['POST'])
+@requires_auth
+def immunelist_clear():
+    data = request.get_json()
+
+    commander, error = get_commander_from_data(data)
+    if error:
+        return error
+
+    status_code, response = server_commands.immunelist_clear(commander)
+    return jsonify({'status_code': status_code, 'response': response})
+
+
 if __name__ == '__main__':
     ssl_context = None
     if config.SSL_CERT_PATH and config.SSL_KEY_PATH:

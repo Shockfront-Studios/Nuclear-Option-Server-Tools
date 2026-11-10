@@ -287,9 +287,9 @@ Clears the list of kicked players allowing them to rejoin.
 
 ### `banlist-reload`
 
-Reloads the ban list from the list of files in server config. 
+Reloads the ban list and error kick immune list from the files in server config (`BanListPaths` and `ErrorKickImmuneListPaths`).
 
-**NOTE:** Will only add new Ids, use `banlist-clear` before reload if you want to remove all ids first before loading the files again
+**NOTE:** Will only add new Ids, use `banlist-clear` (ban list) or `immunelist-clear` (immune list) before reload if you want to remove all ids first before loading the files again
 
 ```json
 {
@@ -329,9 +329,26 @@ Removes a SteamID from the ban list and from the first configured ban file
 
 Clears the ban list loaded in the Authenticator. **NOTE:** This command does **not** modify any ban list files. 
 
+Does not clear the error kick immune list, use `immunelist-clear` for that.
+
 ```json
 {
     "name": "banlist-clear",
+    "arguments": []
+}
+```
+
+### `immunelist-clear`
+
+Clears the error kick immune list loaded in the Authenticator. **NOTE:** This command does **not** modify any immune list files.
+
+Use `banlist-reload` after to load the files from `ErrorKickImmuneListPaths` again, eg after removing an id from a file.
+
+Older game servers don't have this command and will reply with `UnknownCommand`.
+
+```json
+{
+    "name": "immunelist-clear",
     "arguments": []
 }
 ```

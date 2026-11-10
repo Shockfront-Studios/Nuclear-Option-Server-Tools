@@ -82,6 +82,11 @@ def banlist_clear(commander: RemoteCommander):
     return commander.send_command("banlist-clear")
 
 
+def immunelist_clear(commander: RemoteCommander):
+    """Clears the error kick immune list loaded in the Authenticator. Use banlist_reload after to load the files again."""
+    return commander.send_command("immunelist-clear")
+
+
 def get_player_list(commander: RemoteCommander):
     """Retrieves the current connected player list from the server."""
     return commander.send_command("get-player-list")
