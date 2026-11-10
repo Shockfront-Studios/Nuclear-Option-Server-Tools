@@ -95,9 +95,9 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
 }
 ```
 
-#### Config Settings
+### Config Settings
 
-**MissionDirectory**
+#### MissionDirectory
 The absolute path where the server will look for custom missions (when using `User` or `Workshop` groups).
 - **Linux example**: `"/home/steam/NuclearOption-Missions"`
 - **Windows example**: `"C:/Games/NuclearOption-Missions"`
@@ -105,26 +105,26 @@ The absolute path where the server will look for custom missions (when using `Us
 "MissionDirectory": "C:/Games/NuclearOption-Missions"
 ```
 
-**ServerName**
+#### ServerName
 The name that will be displayed in the public server list.
 ```json
 "ServerName": "My Nuclear Option Server"
 ```
 
-**MaxPlayers**
+#### MaxPlayers
 The maximum number of players allowed on the server.
 Counts over 16 will display a performance warning to players in the server list. Ensure your server hardware can handle the increased load if setting this higher.
 ```json
 "MaxPlayers": 16
 ```
 
-**Password**
+#### Password
 If set, players must enter this password to join the server. Setting this to an empty string (`""`) means No Password will be required.
 ```json
 "Password": ""
 ```
 
-**Port and QueryPort**
+#### Port and QueryPort
 The server uses an override system for ports. `IsOverride` must be set to `true` for the `Value` to be used; otherwise, the server will use its default ports (7777 and 7778).
 ```json
 "Port": {
@@ -137,7 +137,7 @@ The server uses an override system for ports. `IsOverride` must be set to `true`
 }
 ```
 
-**BanListPaths**
+#### BanListPaths
 A list of file paths (relative to the server executable or absolute) that contain lists of SteamIDs to block from joining.
 - One SteamID per line, with an optional reason after `//`, eg `00000000000000001 // cheating`. See [ban_list.txt](ExampleConfig/ban_list.txt).
 - The `banlist-reload` remote command only adds new ids. To remove ids, use `banlist-clear` then `banlist-reload`. See [ServerCommands](ServerCommands/Readme.md).
@@ -148,13 +148,13 @@ A list of file paths (relative to the server executable or absolute) that contai
 ]
 ```
 
-**DisableErrorKick**
+#### DisableErrorKick
 By default, the server kicks players who cause errors to prevent instability. Set this to `true` to disable this behavior for all players.
 ```json
 "DisableErrorKick": true
 ```
 
-**ErrorKickImmuneListPaths**
+#### ErrorKickImmuneListPaths
 A list of file paths containing SteamIDs of players who should never be kicked for errors, even if `DisableErrorKick` is `false`.
 - Same file format as `BanListPaths`.
 - `banlist-reload` also reloads these files, only adding new ids. To remove ids, use `immunelist-clear` then `banlist-reload`.
@@ -164,7 +164,7 @@ A list of file paths containing SteamIDs of players who should never be kicked f
 ]
 ```
 
-**StaffListPaths**
+#### StaffListPaths
 A list of JSON file paths that give players a permission level and a tag, without needing a mod. Empty by default.
 - **Permission level** controls which chat commands a player can use. Use `"Player"`, `"Moderator"`, `"Admin"`, or a number from `0` to `254` for a custom level between them (eg `75`). `Host` can't be given out.
 - **Tag** is shown before the player's name in chat and on the leaderboard, for every player. Rich text is allowed, eg `<color=red>Admin</color>`. Leave it out for no tag.
@@ -195,31 +195,31 @@ Example staff file (see [staff_list.json](ExampleConfig/staff_list.json)):
 }
 ```
 
-**NoPlayerStopTime**
+#### NoPlayerStopTime
 The time in seconds the server will wait after the last player leaves before unloading the current mission.
 ```json
 "NoPlayerStopTime": 60.0
 ```
 
-**PostMissionDelay**
+#### PostMissionDelay
 The time in seconds the server waits after a mission ends (via the EndGame outcome in a mission) before loading the next mission in the rotation.
 ```json
 "PostMissionDelay": 30.0
 ```
 
-**Hidden**
+#### Hidden
 If `true`, the server will not appear in the public server list.
 ```json
 "Hidden": false
 ```
 
-**ModdedServer**
+#### ModdedServer
 Should be set to `true` if you are running custom server-side mods that may affect user experience or gameplay.
 ```json
 "ModdedServer": false
 ```
 
-**MissionRotation**
+#### MissionRotation
 A list of missions the server will cycle through. Each entry contains a `Key` (Group and Name) and a `MaxTime` in seconds.
 - `Group` / `Name`: Identifies the mission to load. For more details on the available groups and how mission names are used, see [Loading Missions](#loading-missions).
 - `MaxTime`: The maximum duration of the mission in seconds.
@@ -242,7 +242,7 @@ A list of missions the server will cycle through. Each entry contains a `Key` (G
 ]
 ```
 
-**VoteKick**
+#### VoteKick
 Configures the vote-kick feature for players on the server. When a player is successfully vote-kicked, they are blocked from rejoining for the duration of the current mission, but are allowed to rejoin when the next mission starts.
 
 - **Enabled**: If `true`, players are allowed to start vote-kicks. (Default: `true`)
