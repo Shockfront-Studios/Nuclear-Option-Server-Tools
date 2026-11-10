@@ -15,4 +15,4 @@ Copy these next to the server, then replace the example values:
 | `error_kick_immune_list.txt` | `ErrorKickImmuneListPaths` | Same as the ban list |
 | `staff_list.json` | `StaffListPaths` | SteamID with a permission level and optional tag, see the guide |
 
-`RotationType` is a number: `0` Sequence, `1` PureRandom, `2` RandomQueue.
+`RotationType` can be a name (`"Sequence"`, `"PureRandom"`, `"RandomQueue"`) or a number (`0`, `1`, `2`). Older game versions only accept the number.

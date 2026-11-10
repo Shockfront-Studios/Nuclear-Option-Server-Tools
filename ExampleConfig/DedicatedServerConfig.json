@@ -25,7 +25,7 @@
     ],
     "NoPlayerStopTime": 60.0,
     "PostMissionDelay": 30.0,
-    "RotationType": 2,
+    "RotationType": "RandomQueue",
     "MissionRotation": [
         {
             "Key": {

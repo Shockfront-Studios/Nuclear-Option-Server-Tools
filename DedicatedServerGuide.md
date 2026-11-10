@@ -65,7 +65,7 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
     "StaffListPaths": [],
     "NoPlayerStopTime": 30.0,
     "PostMissionDelay": 30.0,
-    "RotationType": 0,
+    "RotationType": "Sequence",
     "MissionRotation": [
         {
             "Key": {
@@ -268,13 +268,19 @@ Configures the vote-kick feature for players on the server. When a player is suc
 
 ### Mission Rotation
 
-The `RotationType` field can be changed to tell the server in what order to play the missions. Set the value to one of the following numeric codes:
+The `RotationType` field can be changed to tell the server in what order to play the missions. Set the value to one of the following names (ignoring case) or numbers:
 
-| Value | Rotation Method | Description |
-| :---: | :--- | :--- |
-| `0` | **Sequence** | Missions are selected in the order. |
-| `1` | **Pure Random** | Each missions is selected at random, allowing for immediate repeats. |
-| `2` | **Random Queue** | Missions are shuffled and selected in that random order, guaranteeing that all missions are played before the shuffle repeats. |
+| Name | Number | Description |
+| :--- | :---: | :--- |
+| `"Sequence"` | `0` | Missions are selected in the order. |
+| `"PureRandom"` | `1` | Each missions is selected at random, allowing for immediate repeats. |
+| `"RandomQueue"` | `2` | Missions are shuffled and selected in that random order, guaranteeing that all missions are played before the shuffle repeats. |
+
+```json
+"RotationType": "RandomQueue"
+```
+
+**NOTE:** Older game versions only accept the number, eg `"RotationType": 2`. Numbers still work on newer versions, so existing configs don't need changing.
 
 ### Loading Missions
 
