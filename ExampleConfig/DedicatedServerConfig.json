@@ -23,8 +23,11 @@
     "StaffListPaths": [
         "staff_list.json"
     ],
+    "IdleBypass":false,
     "NoPlayerStopTime": 60.0,
     "PostMissionDelay": 30.0,
+    "EnableTacviewRecording":false,
+    "TacviewExportPath":"",
     "RotationType": "RandomQueue",
     "MissionRotation": [
         {
