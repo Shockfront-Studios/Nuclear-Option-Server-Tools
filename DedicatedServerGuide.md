@@ -63,8 +63,11 @@ steamcmd +force_install_dir /home/steam/NuclearOptionServer +login anonymous +ap
     "DisableErrorKick": false,
     "ErrorKickImmuneListPaths": [],
     "StaffListPaths": [],
+    "IdleBypass":false,
     "NoPlayerStopTime": 30.0,
     "PostMissionDelay": 30.0,
+    "EnableTacviewRecording":false,
+    "TacviewExportPath":"",
     "RotationType": "Sequence",
     "MissionRotation": [
         {
@@ -195,6 +198,12 @@ Example staff file (see [staff_list.json](ExampleConfig/staff_list.json)):
 }
 ```
 
+#### IdleBypass
+When set to true, the server will not unload the mission and/or engage idle mode with no players connected 
+```
+"IdleBypass": false
+```
+
 #### NoPlayerStopTime
 The time in seconds the server will wait after the last player leaves before unloading the current mission.
 ```json
@@ -264,6 +273,33 @@ Configures the vote-kick feature for players on the server. When a player is suc
     "NewVoteLockout": 10.0,
     "RequesterCooldown": 300.0
 }
+```
+### Tacview
+
+Nuclear Option has a built-in Tacview exporter.
+
+#### EnableTacviewRecording
+Toggle Tacview exporter. When true, missions will be automatically recorded
+```json
+"EnableTacviewRecording":false
+```
+#### TacviewExportPath
+Optional custom export path for Tacview files
+When left empty, it falls back to defaults based on Operating System.
+
+Windows:
+
+  - First default is the value of `HKEY_CURRENT_USER\Software\Raia Software Inc.\TacviewExportPath`
+  - If the registry key doesn't exist, it falls back to `%userprofile%\Documents\Tacview`
+
+Linux: 
+  - First default is the path the `XDG_DATA_HOME` environmental variable points at.
+  - If the variable doesn't exist, it falls back to the `/home/<username>/.local/share/Tacview`
+
+In all cases, the Tacview directory will be automatically created if it doesn't already exist.
+
+```json
+"TacviewExportPath":"",
 ```
 
 ### Mission Rotation
